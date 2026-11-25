@@ -1,0 +1,2 @@
+# Solo se incluye desde PHP; nunca debe servirse por web.
+Require all denied

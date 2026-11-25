@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0ea5e9"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="6" width="32" height="32" rx="10" fill="url(#g)"/>
+  <path d="M10 26c0-5 3.5-9 8-9s8 4 8 9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="18" cy="17" r="2.5" fill="#fff"/>
+  <text x="44" y="30" font-family="Outfit, Arial, sans-serif" font-size="22" font-weight="800" fill="#f1f5f9" letter-spacing="3">NINUBO</text>
+</svg>

@@ -1,0 +1,6 @@
+# Volcados de sendmail / logs locales
+crash*.txt
+*.log
+# Archivos generados por el CRM (contratos firmados, PDFs, logos subidos)
+admin/storage/*
+!admin/storage/.htaccess
