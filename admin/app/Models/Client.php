@@ -11,6 +11,22 @@ final class Client
     public const STATUS_COLORS = ['lead' => 'blue', 'active' => 'green', 'inactive' => 'secondary'];
     public const LANGUAGES = ['en' => 'English', 'es' => 'Spanish'];
     public const SOURCES = ['Referral', 'Website', 'Google', 'Facebook', 'Instagram', 'Walk-in', 'Cold call', 'Event', 'Other'];
+    /** USPS state codes (stored) => names (shown). Texas first since almost every client is in the RGV. */
+    public const US_STATES = [
+        'TX' => 'Texas',
+        'AL' => 'Alabama', 'AK' => 'Alaska', 'AZ' => 'Arizona', 'AR' => 'Arkansas', 'CA' => 'California',
+        'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware', 'DC' => 'District of Columbia',
+        'FL' => 'Florida', 'GA' => 'Georgia', 'HI' => 'Hawaii', 'ID' => 'Idaho', 'IL' => 'Illinois',
+        'IN' => 'Indiana', 'IA' => 'Iowa', 'KS' => 'Kansas', 'KY' => 'Kentucky', 'LA' => 'Louisiana',
+        'ME' => 'Maine', 'MD' => 'Maryland', 'MA' => 'Massachusetts', 'MI' => 'Michigan', 'MN' => 'Minnesota',
+        'MS' => 'Mississippi', 'MO' => 'Missouri', 'MT' => 'Montana', 'NE' => 'Nebraska', 'NV' => 'Nevada',
+        'NH' => 'New Hampshire', 'NJ' => 'New Jersey', 'NM' => 'New Mexico', 'NY' => 'New York',
+        'NC' => 'North Carolina', 'ND' => 'North Dakota', 'OH' => 'Ohio', 'OK' => 'Oklahoma', 'OR' => 'Oregon',
+        'PA' => 'Pennsylvania', 'PR' => 'Puerto Rico', 'RI' => 'Rhode Island', 'SC' => 'South Carolina',
+        'SD' => 'South Dakota', 'TN' => 'Tennessee', 'UT' => 'Utah', 'VT' => 'Vermont', 'VA' => 'Virginia',
+        'WA' => 'Washington', 'WV' => 'West Virginia', 'WI' => 'Wisconsin', 'WY' => 'Wyoming',
+    ];
+
     public const CONTACT_METHODS = ['phone' => 'Phone call', 'text' => 'Text message', 'whatsapp' => 'WhatsApp', 'email' => 'Email'];
     public const INDUSTRIES = [
         'Construction & Roofing', 'Home Services (HVAC, Plumbing, Electrical)', 'Landscaping & Pools', 'Automotive',
@@ -155,6 +171,9 @@ final class Client
         }
         if ($data['website'] !== '' && !filter_var($data['website'], FILTER_VALIDATE_URL)) {
             $errors['website'] = 'Enter a valid website address.';
+        }
+        if (!isset(self::US_STATES[$data['state']])) {
+            $errors['state'] = 'Choose a state from the list.';
         }
         if ($data['zip'] !== '' && !preg_match('/^\d{5}(-\d{4})?$/', $data['zip'])) {
             $errors['zip'] = 'Use a 5-digit ZIP code.';

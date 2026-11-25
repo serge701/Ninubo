@@ -50,7 +50,7 @@ $sources = array_combine(Client::SOURCES, Client::SOURCES);
             <?= form_field('address1', 'Address line 1', $v('address1')) ?>
             <?= form_field('address2', 'Address line 2', $v('address2'), ['placeholder' => 'Suite, unit…']) ?>
             <?= form_field('city', 'City', $v('city'), ['col' => 'col-md-5', 'placeholder' => 'McAllen']) ?>
-            <?= form_field('state', 'State', $v('state'), ['col' => 'col-md-3']) ?>
+            <?= form_field('state', 'State', $v('state') ?: 'TX', ['col' => 'col-md-3', 'type' => 'select', 'options' => Client::US_STATES]) ?>
             <?= form_field('zip', 'ZIP code', $v('zip'), ['col' => 'col-md-4']) ?>
           </div>
         </div>
