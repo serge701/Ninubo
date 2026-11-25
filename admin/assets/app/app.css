@@ -67,7 +67,18 @@
 .crm-dl dd { margin-bottom: .35rem; }
 .crm-timeline-system { background: var(--tblr-bg-surface-secondary); }
 .crm-timeline-system .mt-1 { color: var(--tblr-secondary); }
-.crm-composer .btn-group > .btn { flex: 1 1 auto; }
+/* Activity type picker: separate buttons; the chosen one is solid primary so it never looks like a hover state. */
+.crm-type-picker { display: flex; flex-wrap: wrap; gap: .4rem; }
+.crm-type-picker > .btn { flex: 1 1 auto; }
+.crm-type-picker > .btn-check:checked + .btn,
+.crm-type-picker > .btn-check:checked + .btn:hover {
+  background-color: var(--tblr-primary);
+  border-color: var(--tblr-primary);
+  color: #fff;
+}
+.crm-type-picker > .btn-check:focus-visible + .btn {
+  box-shadow: 0 0 0 .2rem rgba(var(--tblr-primary-rgb), .35);
+}
 .crm-due { display: none; }
 .crm-due.is-visible { display: block; }
 .crm-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 520px; }

@@ -123,9 +123,9 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
       <div class="card-body border-bottom">
         <form method="post" action="<?= url('/clients/' . $id . '/activities') ?>" class="crm-composer">
           <?= csrf_field() ?>
-          <div class="btn-group w-100 mb-2 flex-wrap" role="group" aria-label="Activity type">
+          <div class="crm-type-picker mb-2" role="radiogroup" aria-label="Activity type">
             <?php foreach (Activity::TYPES as $key => [$label, $icon]): if ($key === 'system') continue; ?>
-            <input type="radio" class="btn-check" name="type" id="type_<?= $key ?>" value="<?= $key ?>"<?= old('type', 'note') === $key ? ' checked' : '' ?>>
+            <input type="radio" class="btn-check" name="type" id="type_<?= $key ?>" value="<?= $key ?>" autocomplete="off"<?= old('type', 'note') === $key ? ' checked' : '' ?>>
             <label for="type_<?= $key ?>" class="btn btn-sm"><i class="ti ti-<?= $icon ?> me-1"></i><?= e($label) ?></label>
             <?php endforeach; ?>
           </div>
