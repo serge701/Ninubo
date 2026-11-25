@@ -216,10 +216,13 @@ function ninubo_brief_is_empty($value): bool {
     return $value === null || trim((string)$value) === '';
 }
 
-/** Vista de solo lectura de un campo, para el panel admin. */
-function ninubo_brief_render_view(string $name, array $field, $value): string {
+/**
+ * Vista de solo lectura de un campo, para el panel admin (CRM). $field debe venir del
+ * esquema resuelto en el mismo idioma que $lang (p.ej. ninubo_brief_schema('en')).
+ */
+function ninubo_brief_render_view(string $name, array $field, $value, string $lang = 'es'): string {
     $label = ninubo_brief_esc($field['label'] ?? '');
-    $empty = '<span class="brief-view-empty">— no proporcionado —</span>';
+    $empty = '<span class="brief-view-empty">' . ($lang === 'en' ? '— not provided —' : '— no proporcionado —') . '</span>';
 
     switch ($field['type']) {
         case 'text':
@@ -251,7 +254,7 @@ function ninubo_brief_render_view(string $name, array $field, $value): string {
             foreach ($value as $i => $item) {
                 $out .= "<div class=\"brief-view-subitem\"><p class=\"brief-view-subtitle\">" . ninubo_brief_esc($field['item_label']) . " {$i}</p>";
                 foreach ($field['subfields'] as $subName => $subField) {
-                    $out .= ninubo_brief_render_view($subName, $subField, $item[$subName] ?? '');
+                    $out .= ninubo_brief_render_view($subName, $subField, $item[$subName] ?? '', $lang);
                 }
                 $out .= '</div>';
             }

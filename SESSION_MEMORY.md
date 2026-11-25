@@ -34,6 +34,18 @@
   - Admin panel: CSRF token on every POST (login, create, delete, logout), logout is now POST-only, session cookie is HttpOnly + SameSite=Lax + Secure on HTTPS and scoped to `/admin/`, 2h idle timeout, and a per-IP lockout after 5 failed logins in 15 min (stored in PHP's temp dir as `ninubo_login_*.json`; delete that file to unlock early). See `includes/admin-auth.php`.
   - `ninubo_translate_html()` no longer runs on `brief.php`, `admin/` or `api/` (see `ninubo_should_translate_page()` in `includes/config.php`), so client answers are never altered by the EN string replacement.
 
+- CRM rebuild of `/admin` (2026-11-25) — see `CLAUDE.md` for conventions:
+  - Phase 0: git repo initialized (remote `origin` = github.com/serge701/Ninubo, **public**); DB backup at
+    `C:\xampp\backups\ninubo_2026-11-25_pre-crm.sql`.
+  - Phase 1 (done): Tabler 1.4 vertical layout, username+password login with `users` table (roles admin/sales),
+    login throttling in `login_attempts`, forced password change for temporary passwords, user management, profile,
+    Business settings (identity, logo, invoice numbering, Texas sales tax, contract venue), migrations runner,
+    Website briefs module migrated (English view). Old `admin/login.php`, `logout.php`, `brief-ver.php`,
+    `includes/admin-auth.php` removed; `/admin/brief-ver.php?id=N` still redirects to `/admin/briefs/N`.
+  - To deploy: upload `admin/`, open `/admin/` → setup screen (asks for the old panel password) creates tables + first admin.
+  - Next phases: 2) clients + activity + packages catalog (briefs linked to client/package, questions vary by package),
+    3) invoices + payments + PDF (Dompdf), 4) contracts with English RGV template + e-signature link + PDF, 5) dashboard KPIs.
+
 ## Important follow-ups
 
 - ~~Confirm the canonical contact number~~ — Resolved 2026-09-05: canonical number is 8995-08-3462 (`+528995083462`), matching the visible text and WhatsApp. `tel:` links in `contacto.php`, `includes/footer.php`, and both language strings in `aviso-de-privacidad.php` were pointing to a stale `+528991225076` and have been corrected.

@@ -1,0 +1,61 @@
+/* Ninubo CRM — small additions on top of Tabler 1.4 */
+
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"] {
+  /* Brand accent (sky blue from the Ninubo logo) */
+  --tblr-primary: #0284c7;
+  --tblr-primary-rgb: 2, 132, 199;
+  --tblr-primary-text: #0369a1;
+  --tblr-primary-fg: #fff;
+}
+
+.crm-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  text-decoration: none;
+}
+.crm-brand-logo { height: 28px; width: auto; }
+.crm-auth-logo { height: 40px; width: auto; }
+.crm-brand-tag {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  padding: .15rem .4rem;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, .18);
+  color: #7dd3fc;
+}
+
+.navbar-vertical .crm-nav-heading {
+  padding: .25rem 1rem;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .45);
+}
+
+.crm-auth { background: #0b1220; }
+
+/* Theme toggle shows the icon of the mode you would switch to */
+[data-bs-theme="light"] .crm-theme-icon-light,
+[data-bs-theme="dark"] .crm-theme-icon-dark { display: none; }
+
+.crm-logo-preview {
+  background: #fff;
+  border: 1px solid var(--tblr-border-color);
+  border-radius: 6px;
+  padding: .5rem .75rem;
+}
+.crm-logo-preview img { max-height: 48px; max-width: 200px; display: block; }
+
+/* Read-only brief answers (markup from includes/brief-helpers.php) */
+.crm-brief-view .brief-view-row { padding: .6rem 0; border-bottom: 1px solid var(--tblr-border-color); }
+.crm-brief-view .brief-view-row:last-child { border-bottom: 0; }
+.crm-brief-view .brief-view-label { font-weight: 600; margin-bottom: .2rem; color: var(--tblr-secondary); font-size: .85rem; }
+.crm-brief-view .brief-view-value { margin: 0; white-space: normal; }
+.crm-brief-view .brief-view-empty { color: var(--tblr-secondary); font-style: italic; }
+.crm-brief-view .brief-view-subitem { margin: .5rem 0 .5rem 1rem; padding-left: .75rem; border-left: 3px solid var(--tblr-border-color); }
+.crm-brief-view .brief-view-subtitle { font-weight: 600; margin-bottom: .25rem; }

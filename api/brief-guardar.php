@@ -74,12 +74,13 @@ try {
 
 if ($action === 'submit') {
     $destinatario = 'contacto@ninubo.com';
-    $asunto = '[NINUBO] Brief completado: ' . $client['client_label'];
-    $adminLink = ninubo_absolute_url('admin/brief-ver.php?id=' . $client['id'], 'es');
-    $cuerpo = "El cliente \"{$client['client_label']}\" completó su formulario de información inicial.\n\n";
-    $cuerpo .= "Ver respuestas: {$adminLink}\n";
-    $cuerpo .= "Idioma usado por el cliente: " . ($lang === 'en' ? 'Inglés' : 'Español') . "\n";
-    $cuerpo .= "Fecha: " . date('d/m/Y H:i') . "\n";
+    // Aviso interno para el equipo (el CRM está en inglés).
+    $asunto = mb_encode_mimeheader('[NINUBO CRM] Website brief submitted: ' . $client['client_label'], 'UTF-8');
+    $adminLink = ninubo_absolute_url('admin/briefs/' . (int)$client['id'], 'es');
+    $cuerpo = "\"{$client['client_label']}\" submitted their website brief.\n\n";
+    $cuerpo .= "View answers: {$adminLink}\n";
+    $cuerpo .= "Form language: " . ($lang === 'en' ? 'English' : 'Spanish') . "\n";
+    $cuerpo .= "Date: " . date('M j, Y g:i A') . "\n";
     $headers = "From: NINUBO Web <no-reply@ninubo.com>\r\nContent-Type: text/plain; charset=UTF-8\r\n";
     @mail($destinatario, $asunto, $cuerpo, $headers);
 
