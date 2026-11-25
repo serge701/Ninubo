@@ -27,6 +27,13 @@ final class Client
         'WA' => 'Washington', 'WV' => 'West Virginia', 'WI' => 'Wisconsin', 'WY' => 'Wyoming',
     ];
 
+    /** Contact person's role — typical decision makers at small/medium businesses in the RGV. */
+    public const CONTACT_TITLES = [
+        'Owner', 'Co-owner', 'Partner', 'President', 'CEO', 'General Manager', 'Operations Manager',
+        'Office Manager', 'Marketing Manager', 'Sales Manager', 'IT Manager', 'Director', 'Administrator',
+        'Practice Manager', 'Doctor / Physician', 'Accountant / Bookkeeper', 'Assistant', 'Employee', 'Other',
+    ];
+
     public const CONTACT_METHODS = ['phone' => 'Phone call', 'text' => 'Text message', 'whatsapp' => 'WhatsApp', 'email' => 'Email'];
     public const INDUSTRIES = [
         'Construction & Roofing', 'Home Services (HVAC, Plumbing, Electrical)', 'Landscaping & Pools', 'Automotive',
@@ -175,6 +182,9 @@ final class Client
         }
         if ($data['website'] !== '' && !filter_var($data['website'], FILTER_VALIDATE_URL)) {
             $errors['website'] = 'Enter a valid website address.';
+        }
+        if ($data['contact_title'] !== '' && !in_array($data['contact_title'], self::CONTACT_TITLES, true)) {
+            $errors['contact_title'] = 'Choose a title from the list.';
         }
         if (!isset(self::US_STATES[$data['state']])) {
             $errors['state'] = 'Choose a state from the list.';

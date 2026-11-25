@@ -32,7 +32,7 @@ $sources = array_combine(Client::SOURCES, Client::SOURCES);
             <?= form_field('company_name', 'Company / business name', $v('company_name'), ['hint' => 'Leave blank if the client is an individual.']) ?>
             <?= form_field('industry', 'Industry', $v('industry'), ['type' => 'select', 'options' => $industries, 'empty' => '—']) ?>
             <?= form_field('contact_name', 'Contact person', $v('contact_name'), ['required' => true, 'placeholder' => 'First and last name']) ?>
-            <?= form_field('contact_title', 'Title / role', $v('contact_title'), ['placeholder' => 'e.g. Owner, Office manager']) ?>
+            <?= form_field('contact_title', 'Title / role', $v('contact_title'), ['type' => 'select', 'options' => array_combine(Client::CONTACT_TITLES, Client::CONTACT_TITLES), 'empty' => '—']) ?>
             <?= form_field('phone', 'Phone', $v('phone'), ['type' => 'tel']) ?>
             <?= form_field('alt_phone', 'Mobile / other phone', $v('alt_phone'), ['type' => 'tel']) ?>
             <?= form_field('email', 'Email', $v('email'), ['type' => 'email']) ?>
