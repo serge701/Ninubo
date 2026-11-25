@@ -23,7 +23,15 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
 - Market: Rio Grande Valley, Texas. USD only. Texas sales tax: data processing services (web design, hosting,
   maintenance) taxed on 80% of the charge (Rule 3.330) — rate and taxable % are settings; confirm with the CPA.
 - Contracts are in English, Texas law, venue county from Settings. E-signature must capture ESIGN/UETA consent + audit trail.
-- Website brief questions live only in `includes/brief-schema.php`; the CRM shows answers with `ninubo_brief_schema('en')`.
+- **Client-first (owner's rule):** a new sale always starts by creating the client. Briefs, invoices and contracts are
+  created *from* a client (client page → "New ▾"); never add a flow that creates them without a client.
+- Every meaningful change on a client writes a timeline entry (`Activity::log`) — status/assignment changes, briefs
+  created/started/submitted (the public `api/brief-guardar.php` logs those too). Keep doing this for invoices/contracts.
+- Catalog (`packages`): price, billing (one-time/monthly/yearly), `tax_type` (data_processing = taxed on the taxable %
+  setting, taxable = 100%, exempt) and `brief_profile`. Items already used can't be deleted, only deactivated.
+- Website brief questions live only in `includes/brief-schema.php`. Profiles (`ninubo_brief_profiles()`: landing,
+  business, ecommerce) filter steps/fields with `'only' => [...]` / `'except' => [...]`; the brief stores the profile at
+  creation. Always call `ninubo_brief_schema($lang, $brief['brief_profile'])`.
 
 ## Safety
 

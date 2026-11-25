@@ -16,7 +16,9 @@ $pendingMigrations = ($me && $me['role'] === 'admin') ? Migrator::pending() : []
 /** Sidebar entries: [path, icon, label, adminOnly]. Modules appear here as they are built. */
 $nav = [
     ['/', 'layout-dashboard', 'Dashboard', false],
+    ['/clients', 'address-book', 'Clients', false],
     ['/briefs', 'forms', 'Website briefs', false],
+    ['/catalog', 'package', 'Catalog', false],
 ];
 $adminNav = [
     ['/users', 'users', 'Users'],

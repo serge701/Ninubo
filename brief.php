@@ -41,7 +41,8 @@ if ($client && !isset($_GET['lang']) && ($client['lang'] ?? 'es') === 'en') {
     exit;
 }
 
-$schema = ninubo_brief_schema($lang);
+// Las preguntas dependen del paquete contratado (perfil guardado al crear el link en el CRM).
+$schema = ninubo_brief_schema($lang, $client['brief_profile'] ?? null);
 $stepKeys = array_keys($schema);
 $data = [];
 if ($client && $client['data']) {

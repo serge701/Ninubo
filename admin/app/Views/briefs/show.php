@@ -6,7 +6,11 @@ use Crm\Models\Brief;
 $newLink = Session::peekFlash('new_brief_link');
 ?>
 <?php View::start('actions'); ?>
+<?php if ($brief['client_id']): ?>
+<a href="<?= url('/clients/' . (int)$brief['client_id']) ?>" class="btn"><i class="ti ti-address-book me-1"></i>Client page</a>
+<?php else: ?>
 <a href="<?= url('/briefs') ?>" class="btn"><i class="ti ti-arrow-left me-1"></i>All briefs</a>
+<?php endif; ?>
 <button type="button" class="btn btn-primary" data-copy="<?= e($link) ?>"><i class="ti ti-copy me-1"></i>Copy client link</button>
 <?php View::end(); ?>
 
@@ -22,6 +26,7 @@ $newLink = Session::peekFlash('new_brief_link');
   <div class="card-body">
     <div class="d-flex flex-wrap gap-4">
       <div><div class="text-secondary small">Status</div><?= status_badge($brief['status'], Brief::STATUS_COLORS, Brief::STATUSES) ?></div>
+      <div><div class="text-secondary small">Package</div><?= e($brief['package_name'] ?: '—') ?> <span class="text-secondary small">(<?= e(Brief::profileLabel($brief['brief_profile'])) ?>)</span></div>
       <div><div class="text-secondary small">Form language</div><?= $brief['lang'] === 'en' ? 'English' : 'Spanish' ?></div>
       <div><div class="text-secondary small">Created</div><?= e(fmt_datetime($brief['created_at'])) ?><?= $brief['created_by_name'] ? ' · ' . e($brief['created_by_name']) : '' ?></div>
       <div><div class="text-secondary small">Last update</div><?= e(fmt_datetime($brief['updated_at'])) ?></div>
@@ -51,7 +56,7 @@ $newLink = Session::peekFlash('new_brief_link');
   <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-2">
     <div>
       <div class="fw-bold">Delete this brief</div>
-      <div class="text-secondary small">Removes the link and every answer. This cannot be undone.</div>
+      <div class="text-secondary small">Removes the link and every answer — the client can no longer open it. This cannot be undone.</div>
     </div>
     <form method="post" action="<?= url('/briefs/' . (int)$brief['id'] . '/delete') ?>" data-confirm="Delete this brief and all its answers? This cannot be undone.">
       <?= csrf_field() ?>

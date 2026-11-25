@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use Crm\Controllers\ActivityController;
 use Crm\Controllers\AuthController;
 use Crm\Controllers\BriefController;
+use Crm\Controllers\CatalogController;
+use Crm\Controllers\ClientController;
 use Crm\Controllers\DashboardController;
 use Crm\Controllers\ProfileController;
 use Crm\Controllers\SettingsController;
@@ -27,7 +30,27 @@ $router->post('/setup', [SetupController::class, 'run'], $public);
 // Dashboard
 $router->get('/', [DashboardController::class, 'index']);
 
-// Website briefs (client fills /brief.php?token=...)
+// Clients — the starting point of every sale
+$router->get('/clients', [ClientController::class, 'index']);
+$router->get('/clients/new', [ClientController::class, 'create']);
+$router->post('/clients', [ClientController::class, 'store']);
+$router->get('/clients/{id}', [ClientController::class, 'show']);
+$router->get('/clients/{id}/edit', [ClientController::class, 'edit']);
+$router->post('/clients/{id}', [ClientController::class, 'update']);
+$router->post('/clients/{id}/delete', [ClientController::class, 'destroy'], $admin);
+$router->post('/clients/{id}/activities', [ActivityController::class, 'store']);
+$router->post('/activities/{id}/toggle', [ActivityController::class, 'toggle']);
+$router->post('/activities/{id}/delete', [ActivityController::class, 'destroy']);
+
+// Packages & services catalog (view: everyone, edit: admin)
+$router->get('/catalog', [CatalogController::class, 'index']);
+$router->get('/catalog/new', [CatalogController::class, 'create'], $admin);
+$router->post('/catalog', [CatalogController::class, 'store'], $admin);
+$router->get('/catalog/{id}/edit', [CatalogController::class, 'edit'], $admin);
+$router->post('/catalog/{id}', [CatalogController::class, 'update'], $admin);
+$router->post('/catalog/{id}/delete', [CatalogController::class, 'destroy'], $admin);
+
+// Website briefs (created from a client + package; the client fills /brief.php?token=...)
 $router->get('/briefs', [BriefController::class, 'index']);
 $router->post('/briefs', [BriefController::class, 'store']);
 $router->get('/briefs/{id}', [BriefController::class, 'show']);

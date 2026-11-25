@@ -50,7 +50,7 @@ $action = ($_POST['action'] ?? 'draft') === 'submit' ? 'submit' : 'draft';
 
 // El esquema se resuelve en cualquier idioma solo para validar — las opciones de
 // checkboxes/radio usan claves estables independientes del idioma (ver brief-schema.php).
-$schema = ninubo_brief_schema();
+$schema = ninubo_brief_schema('es', $client['brief_profile'] ?? null);
 $stepCount = count($schema);
 $currentStep = (int)($_POST['current_step'] ?? 1);
 $currentStep = max(1, min($stepCount, $currentStep));
@@ -66,6 +66,14 @@ try {
         $stmt = $pdo->prepare('UPDATE client_briefs SET data = ?, current_step = ?, status = ?, lang = ? WHERE id = ?');
         $newStatus = $client['status'] === 'pendiente' ? 'en_progreso' : $client['status'];
         $stmt->execute([$json, $currentStep, $newStatus, $lang, $client['id']]);
+        if ($client['status'] === 'pendiente' && !empty($client['client_id'])) {
+            try {
+                $pdo->prepare("INSERT INTO client_activities (client_id, type, body) VALUES (?, 'system', ?)")
+                    ->execute([(int)$client['client_id'], 'Client started filling in the website brief.']);
+            } catch (Throwable $e) {
+                // Historial opcional.
+            }
+        }
     }
 } catch (Throwable $e) {
     echo json_encode(['success' => false, 'message' => $t('No fue posible guardar. Intente de nuevo en unos minutos.', 'We could not save your progress. Please try again in a few minutes.')]);
@@ -83,6 +91,16 @@ if ($action === 'submit') {
     $cuerpo .= "Date: " . date('M j, Y g:i A') . "\n";
     $headers = "From: NINUBO Web <no-reply@ninubo.com>\r\nContent-Type: text/plain; charset=UTF-8\r\n";
     @mail($destinatario, $asunto, $cuerpo, $headers);
+
+    // Deja constancia en el historial del cliente del CRM (si el brief está ligado a un cliente).
+    if (!empty($client['client_id'])) {
+        try {
+            $pdo->prepare("INSERT INTO client_activities (client_id, type, body) VALUES (?, 'system', ?)")
+                ->execute([(int)$client['client_id'], 'Client submitted the website brief.']);
+        } catch (Throwable $e) {
+            // El historial es opcional; el envío del brief ya quedó guardado.
+        }
+    }
 
     echo json_encode(['success' => true, 'message' => $t('¡Gracias! Recibimos su información correctamente.', 'Thank you! We received your information successfully.')]);
     exit;

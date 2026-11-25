@@ -7,8 +7,8 @@ use Crm\Models\Brief;
 <?php View::end(); ?>
 
 <p class="text-secondary">
-  Each brief is a private link where a client fills in the information for their new website (in English or Spanish).
-  Progress is saved automatically and you can read the answers here.
+  A brief is a private link where the client fills in the information for their new website, with the questions of the
+  package they bought. Briefs are normally created from the client's page.
 </p>
 
 <div class="card">
@@ -25,26 +25,28 @@ use Crm\Models\Brief;
     <div class="empty">
       <div class="empty-icon"><i class="ti ti-forms" style="font-size:2.5rem"></i></div>
       <p class="empty-title">No briefs here</p>
-      <p class="empty-subtitle text-secondary">Create a link and send it to your client.</p>
+      <p class="empty-subtitle text-secondary">Open a client and choose New → Website brief.</p>
     </div>
   </div>
   <?php else: ?>
   <div class="table-responsive">
     <table class="table table-vcenter card-table">
       <thead>
-        <tr><th>Client</th><th>Status</th><th>Language</th><th>Created</th><th>Last update</th><th class="w-1"></th></tr>
+        <tr><th>Client</th><th>Package</th><th>Status</th><th>Language</th><th>Last update</th><th class="w-1"></th></tr>
       </thead>
       <tbody>
       <?php foreach ($briefs as $b): ?>
         <tr>
           <td>
             <a href="<?= url('/briefs/' . (int)$b['id']) ?>" class="fw-medium"><?= e($b['client_label']) ?></a>
-            <?php if ($b['created_by_name']): ?><div class="small text-secondary">by <?= e($b['created_by_name']) ?></div><?php endif; ?>
+            <div class="small text-secondary">
+              <?php if ($b['client_id']): ?><a href="<?= url('/clients/' . (int)$b['client_id']) ?>" class="text-secondary"><i class="ti ti-address-book"></i> Client page</a><?php else: ?>Not linked to a client<?php endif; ?>
+            </div>
           </td>
+          <td><?= e($b['package_name'] ?: '—') ?><div class="small text-secondary"><?= e(Brief::profileLabel($b['brief_profile'])) ?></div></td>
           <td><?= status_badge($b['status'], Brief::STATUS_COLORS, Brief::STATUSES) ?></td>
           <td><?= $b['lang'] === 'en' ? 'English' : 'Spanish' ?></td>
-          <td class="text-secondary"><?= e(fmt_date($b['created_at'])) ?></td>
-          <td class="text-secondary"><?= e(fmt_datetime($b['updated_at'])) ?></td>
+          <td class="text-secondary"><?= e(time_ago($b['updated_at'])) ?></td>
           <td>
             <div class="btn-list flex-nowrap">
               <a href="<?= url('/briefs/' . (int)$b['id']) ?>" class="btn btn-sm">Open</a>
@@ -59,27 +61,9 @@ use Crm\Models\Brief;
   <?php endif; ?>
 </div>
 
-<div class="modal modal-blur fade" id="new-brief" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <form class="modal-content" method="post" action="<?= url('/briefs') ?>">
-      <?= csrf_field() ?>
-      <div class="modal-header">
-        <h5 class="modal-title">New brief link</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <label class="form-label required" for="client_label">Client name</label>
-        <input type="text" class="form-control<?= invalid('client_label') ?>" id="client_label" name="client_label" value="<?= e(old('client_label')) ?>" placeholder="e.g. ABC Roofing — McAllen" required maxlength="190">
-        <?php if ($err = field_error('client_label')): ?><div class="invalid-feedback"><?= e($err) ?></div><?php endif; ?>
-        <div class="form-hint">Only for you to identify the link. The client sees it at the top of their form.</div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create link</button>
-      </div>
-    </form>
-  </div>
-</div>
-<?php if (field_error('client_label')): ?>
-<script>document.addEventListener('DOMContentLoaded', function () { window.tabler && new tabler.Modal(document.getElementById('new-brief')).show(); });</script>
-<?php endif; ?>
+<?= View::partial('briefs/_new_modal', [
+    'clientId' => null,
+    'clientLanguage' => null,
+    'briefPackages' => $briefPackages,
+    'clientOptions' => $clientOptions,
+]) ?>

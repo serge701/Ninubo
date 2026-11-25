@@ -110,6 +110,7 @@ function ninubo_brief_schema_raw(): array {
         ],
 
         'cliente_ideal' => [
+            'except' => ['landing'],
             'title' => $bt('Cliente ideal', 'Ideal customer'),
             'desc' => $bt('A quién le hablas y qué te diferencia de la competencia.', 'Who you\'re speaking to and what sets you apart from the competition.'),
             'fields' => [
@@ -133,6 +134,7 @@ function ninubo_brief_schema_raw(): array {
         ],
 
         'estructura_sitio' => [
+            'except' => ['landing'],
             'title' => $bt('Páginas del sitio', 'Site pages'),
             'desc' => $bt('Indique qué páginas desea incluir.', 'Indicate which pages you want to include.'),
             'fields' => [
@@ -167,9 +169,9 @@ function ninubo_brief_schema_raw(): array {
                     'send_message' => $bt('Send a Message', 'Send a Message'),
                     'view_services' => $bt('View Our Services', 'View Our Services'),
                 ]],
-                'historia_empresa' => ['type' => 'textarea', 'label' => $bt('Historia de la empresa', 'Company history'), 'hint' => $bt('Cuéntenos brevemente cómo inició el negocio.', 'Briefly tell us how the business started.')],
+                'historia_empresa' => ['except' => ['landing'], 'type' => 'textarea', 'label' => $bt('Historia de la empresa', 'Company history'), 'hint' => $bt('Cuéntenos brevemente cómo inició el negocio.', 'Briefly tell us how the business started.')],
                 'anos_experiencia' => ['type' => 'text', 'label' => $bt('¿Cuántos años de experiencia tiene?', 'How many years of experience do you have?')],
-                'mision_filosofia' => ['type' => 'textarea', 'label' => $bt('Misión / filosofía', 'Mission / philosophy'), 'hint' => $bt('¿Qué representa su empresa?', 'What does your company stand for?')],
+                'mision_filosofia' => ['except' => ['landing'], 'type' => 'textarea', 'label' => $bt('Misión / filosofía', 'Mission / philosophy'), 'hint' => $bt('¿Qué representa su empresa?', 'What does your company stand for?')],
                 'diferencia_empresa' => ['type' => 'textarea', 'label' => $bt('¿Qué hace diferente a su empresa?', 'What makes your company different?')],
             ],
         ],
@@ -199,6 +201,7 @@ function ninubo_brief_schema_raw(): array {
         ],
 
         'google_reviews' => [
+            'except' => ['landing'],
             'title' => $bt('Google y reseñas', 'Google and reviews'),
             'desc' => $bt('Presencia en Google, testimonios y palabras clave.', 'Google presence, testimonials, and keywords.'),
             'fields' => [
@@ -282,15 +285,58 @@ function ninubo_brief_schema_raw(): array {
                 'color_otros' => ['type' => 'text', 'label' => $bt('Otros colores', 'Other colors')],
                 'referencias' => ['type' => 'list', 'label' => $bt('Sitios web de referencia', 'Reference websites'), 'item_label' => $bt('Referencia', 'Reference'), 'count' => 5],
                 'diseno_que_gusta' => ['type' => 'textarea', 'label' => $bt('¿Qué le gusta de estos sitios?', 'What do you like about these sites?')],
-                'competidores' => ['type' => 'repeat', 'item_label' => $bt('Competidor', 'Competitor'), 'count' => 3, 'subfields' => [
+                'competidores' => ['except' => ['landing'], 'type' => 'repeat', 'item_label' => $bt('Competidor', 'Competitor'), 'count' => 3, 'subfields' => [
                     'nombre' => ['type' => 'text', 'label' => $bt('Nombre', 'Name')],
                     'website' => ['type' => 'text', 'label' => $bt('Website', 'Website')],
                 ]],
-                'competencia_opinion' => ['type' => 'textarea', 'label' => $bt('¿Qué le gusta o no le gusta de las páginas de sus competidores?', 'What do you like or dislike about your competitors\' websites?')],
+                'competencia_opinion' => ['except' => ['landing'], 'type' => 'textarea', 'label' => $bt('¿Qué le gusta o no le gusta de las páginas de sus competidores?', 'What do you like or dislike about your competitors\' websites?')],
+            ],
+        ],
+
+        'tienda' => [
+            'only' => ['ecommerce'],
+            'title' => $bt('Tienda en línea', 'Online store'),
+            'desc' => $bt('Lo que necesitamos saber para armar su tienda.', 'What we need to know to build your store.'),
+            'fields' => [
+                'tienda_num_productos' => ['type' => 'radio', 'label' => $bt('¿Cuántos productos venderá aproximadamente?', 'About how many products will you sell?'), 'options' => [
+                    'hasta_20' => $bt('Hasta 20', 'Up to 20'),
+                    '20_100' => $bt('20 a 100', '20 to 100'),
+                    '100_500' => $bt('100 a 500', '100 to 500'),
+                    'mas_500' => $bt('Más de 500', 'More than 500'),
+                ]],
+                'tienda_categorias' => ['type' => 'textarea', 'label' => $bt('Categorías de productos', 'Product categories'), 'hint' => $bt('Ejemplo: Ropa de hombre, Ropa de mujer, Accesorios.', 'Example: Men\'s clothing, Women\'s clothing, Accessories.')],
+                'tienda_variantes' => ['type' => 'radio', 'label' => $bt('¿Sus productos tienen variantes (talla, color, tamaño)?', 'Do your products have variants (size, color, etc.)?'), 'options' => [
+                    'si' => $bt('Sí', 'Yes'), 'no' => $bt('No', 'No'),
+                ]],
+                'tienda_info_productos' => ['type' => 'radio', 'label' => $bt('¿Tiene lista la información de sus productos (fotos, descripciones, precios)?', 'Is your product information ready (photos, descriptions, prices)?'), 'options' => [
+                    'completa' => $bt('Sí, completa', 'Yes, complete'),
+                    'parcial' => $bt('Parcialmente', 'Partially'),
+                    'no' => $bt('No, necesito ayuda', 'No, I need help'),
+                ]],
+                'tienda_pagos' => ['type' => 'checkboxes', 'label' => $bt('¿Qué formas de pago desea aceptar?', 'Which payment methods do you want to accept?'), 'other' => true, 'options' => [
+                    'tarjeta' => $bt('Tarjeta de crédito / débito', 'Credit / debit card'),
+                    'paypal' => $bt('PayPal', 'PayPal'),
+                    'apple_google_pay' => $bt('Apple Pay / Google Pay', 'Apple Pay / Google Pay'),
+                    'zelle' => $bt('Zelle', 'Zelle'),
+                    'efectivo_entrega' => $bt('Efectivo al recoger / entregar', 'Cash on pickup / delivery'),
+                ]],
+                'tienda_procesador' => ['type' => 'text', 'label' => $bt('¿Ya tiene cuenta con algún procesador de pagos?', 'Do you already have a payment processor account?'), 'hint' => $bt('Ejemplo: Stripe, Square, PayPal, Clover.', 'Example: Stripe, Square, PayPal, Clover.')],
+                'tienda_entrega' => ['type' => 'checkboxes', 'label' => $bt('¿Cómo entregará sus productos?', 'How will you deliver your products?'), 'other' => true, 'options' => [
+                    'envio_usa' => $bt('Envío a todo EE. UU.', 'Shipping anywhere in the US'),
+                    'entrega_local' => $bt('Entrega local', 'Local delivery'),
+                    'recoger' => $bt('Recoger en tienda', 'In-store pickup'),
+                    'digital' => $bt('Productos digitales / descargables', 'Digital / downloadable products'),
+                ]],
+                'tienda_envio_costos' => ['type' => 'textarea', 'label' => $bt('¿Cómo cobra el envío?', 'How do you charge for shipping?'), 'hint' => $bt('Ejemplo: tarifa fija de $10, gratis en compras mayores a $75, según peso.', 'Example: flat $10 rate, free over $75, by weight.')],
+                'tienda_inventario' => ['type' => 'radio', 'label' => $bt('¿Necesita control de inventario en la tienda?', 'Do you need inventory tracking in the store?'), 'options' => [
+                    'si' => $bt('Sí', 'Yes'), 'no' => $bt('No', 'No'),
+                ]],
+                'tienda_politicas' => ['type' => 'textarea', 'label' => $bt('Políticas de devolución y cambios', 'Return and exchange policy'), 'hint' => $bt('Si ya las tiene, péguelas aquí o indique dónde encontrarlas.', 'If you already have one, paste it here or tell us where to find it.')],
             ],
         ],
 
         'funcionalidades_legal' => [
+            'except' => ['landing'],
             'title' => $bt('Funcionalidades y legal', 'Features and legal'),
             'desc' => $bt('Extras que quieras en el sitio y documentos legales.', 'Extras you want on the site and legal documents.'),
             'fields' => [
@@ -354,15 +400,47 @@ function ninubo_brief_schema_raw(): array {
     ];
 }
 
-function ninubo_brief_schema(string $lang = 'es'): array {
+/**
+ * Perfiles de brief: cada paquete del catálogo del CRM (tabla packages.brief_profile)
+ * elige uno, y el cliente solo ve las preguntas de ese perfil.
+ *  - Un paso o campo con 'only' => [...] aparece solo para esos perfiles.
+ *  - Un paso o campo con 'except' => [...] se oculta para esos perfiles.
+ *  - Sin perfil (briefs anteriores a los perfiles) = todo lo que no tiene 'only' (igual que 'business').
+ */
+function ninubo_brief_profiles(): array {
+    return [
+        'landing' => 'Landing page (one page)',
+        'business' => 'Business website (multi-page)',
+        'ecommerce' => 'Online store',
+    ];
+}
+
+function ninubo_brief_applies(array $item, ?string $profile): bool {
+    if (isset($item['only']) && !in_array($profile, $item['only'], true)) {
+        return false;
+    }
+    if (isset($item['except']) && $profile !== null && in_array($profile, $item['except'], true)) {
+        return false;
+    }
+    return true;
+}
+
+function ninubo_brief_schema(string $lang = 'es', ?string $profile = null): array {
     static $cache = [];
     $lang = $lang === 'en' ? 'en' : 'es';
-    if (isset($cache[$lang])) {
-        return $cache[$lang];
+    $profile = ($profile !== null && isset(ninubo_brief_profiles()[$profile])) ? $profile : null;
+    $cacheKey = $lang . '|' . ($profile ?? '');
+    if (isset($cache[$cacheKey])) {
+        return $cache[$cacheKey];
     }
 
     $resolved = [];
     foreach (ninubo_brief_schema_raw() as $stepKey => $step) {
+        if (!ninubo_brief_applies($step, $profile)) {
+            continue;
+        }
+        $step['fields'] = array_filter($step['fields'], fn($field) => ninubo_brief_applies($field, $profile));
+        unset($step['only'], $step['except']);
         $resolvedStep = $step;
         $resolvedStep['title'] = ninubo_brief_resolve_text($step['title'], $lang);
         if (isset($step['desc'])) {
@@ -376,6 +454,6 @@ function ninubo_brief_schema(string $lang = 'es'): array {
         $resolved[$stepKey] = $resolvedStep;
     }
 
-    $cache[$lang] = $resolved;
+    $cache[$cacheKey] = $resolved;
     return $resolved;
 }

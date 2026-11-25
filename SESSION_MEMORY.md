@@ -43,8 +43,13 @@
     Website briefs module migrated (English view). Old `admin/login.php`, `logout.php`, `brief-ver.php`,
     `includes/admin-auth.php` removed; `/admin/brief-ver.php?id=N` still redirects to `/admin/briefs/N`.
   - To deploy: upload `admin/`, open `/admin/` → setup screen (asks for the old panel password) creates tables + first admin.
-  - Next phases: 2) clients + activity + packages catalog (briefs linked to client/package, questions vary by package),
-    3) invoices + payments + PDF (Dompdf), 4) contracts with English RGV template + e-signature link + PDF, 5) dashboard KPIs.
+  - Phase 2 (done): Clients (list/search/filters, client page with "New ▾" menu, activity timeline with notes, calls,
+    WhatsApp, meetings and dated follow-ups), Catalog of packages & services (price, billing, Texas tax type, brief
+    profile; 5 starter items at $0.00), briefs created from client + package with per-package questions (landing 9 steps,
+    business 13, ecommerce 14 incl. new "Online store" step), dashboard with leads/active/follow-ups. The 2 pre-CRM briefs
+    are not linked to a client (shown as "Not linked to a client", full questionnaire).
+  - Next phases: 3) invoices + payments + PDF (Dompdf), 4) contracts with English RGV template + e-signature link + PDF,
+    5) dashboard KPIs.
 
 ## Important follow-ups
 

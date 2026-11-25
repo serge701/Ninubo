@@ -53,3 +53,31 @@
     if (input) input.type = input.type === 'password' ? 'text' : 'password';
   });
 })();
+
+(function () {
+  'use strict';
+
+  // Activity composer: the due-date field only applies to follow-ups.
+  var composer = document.querySelector('.crm-composer');
+  if (composer) {
+    var due = composer.querySelector('[data-due-field]');
+    var sync = function () {
+      var type = composer.querySelector('input[name="type"]:checked');
+      if (due) due.classList.toggle('is-visible', !!type && type.value === 'task');
+    };
+    composer.addEventListener('change', sync);
+    sync();
+  }
+
+  // "New → Follow-up / Note" menu items pre-select the type and focus the composer.
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest('[data-focus-composer]');
+    if (!link || !composer) return;
+    e.preventDefault();
+    var radio = composer.querySelector('input[name="type"][value="' + link.getAttribute('data-focus-composer') + '"]');
+    if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+    composer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var body = composer.querySelector('textarea');
+    if (body) setTimeout(function () { body.focus(); }, 300);
+  });
+})();
