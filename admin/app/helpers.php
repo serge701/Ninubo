@@ -82,6 +82,41 @@ function money(float|int|string|null $amount, string $currency = 'USD'): string
     return $symbol . number_format((float)$amount, 2) . ($symbol === '' ? ' ' . $currency : '');
 }
 
+/**
+ * Normalizes a US phone number to "(956) 555-0123". Accepts any punctuation and a leading +1 / 1.
+ * Returns '' for empty input and null when it isn't a 10-digit number (caller shows a validation error).
+ */
+function us_phone(?string $raw): ?string
+{
+    $digits = preg_replace('/\D/', '', (string)$raw);
+    if ($digits === '') {
+        return '';
+    }
+    if (strlen($digits) === 11 && $digits[0] === '1') {
+        $digits = substr($digits, 1);
+    }
+    if (strlen($digits) !== 10) {
+        return null;
+    }
+    return sprintf('(%s) %s-%s', substr($digits, 0, 3), substr($digits, 3, 3), substr($digits, 6));
+}
+
+/** Validates + normalizes phone fields in $data in place; adds "Enter a 10-digit…" errors. */
+function normalize_phones(array &$data, array $fields, array &$errors): void
+{
+    foreach ($fields as $field) {
+        if (!array_key_exists($field, $data)) {
+            continue;
+        }
+        $formatted = us_phone((string)$data[$field]);
+        if ($formatted === null) {
+            $errors[$field] = 'Enter a 10-digit US phone number, e.g. (956) 555-0123.';
+        } else {
+            $data[$field] = $formatted;
+        }
+    }
+}
+
 /** "Sergio Ureña" -> "SU". */
 function initials(string $name): string
 {
@@ -103,6 +138,11 @@ function form_field(string $name, string $label, mixed $value, array $o = []): s
     $id = 'f_' . preg_replace('/[^a-z0-9_]/i', '_', $name);
     $cls = invalid($name);
     $req = !empty($o['required']) ? ' required' : '';
+    if ($type === 'tel') {
+        // Masked as "(956) 555-0123" by app.js; the server normalizes/validates again (us_phone()).
+        $o['placeholder'] ??= '(956) 555-0123';
+        $o['attrs'] = ($o['attrs'] ?? '') . ' inputmode="tel" autocomplete="tel"';
+    }
     $extra = ($o['attrs'] ?? '') . (isset($o['placeholder']) ? ' placeholder="' . e($o['placeholder']) . '"' : '');
 
     $html = '<div class="' . e($o['col'] ?? 'col-md-6') . '">'

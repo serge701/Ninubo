@@ -64,9 +64,10 @@ final class User
     /**
      * Validates profile fields. @return array<string,string> field => error
      */
-    public static function validate(array $data, ?int $ignoreId = null, bool $checkUsername = true): array
+    public static function validate(array &$data, ?int $ignoreId = null, bool $checkUsername = true): array
     {
         $errors = [];
+        normalize_phones($data, ['phone'], $errors);
         if ($checkUsername) {
             $username = mb_strtolower(trim((string)($data['username'] ?? '')));
             if (!preg_match('/^[a-z0-9._-]{3,60}$/', $username)) {

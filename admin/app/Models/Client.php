@@ -156,10 +156,14 @@ final class Client
         return $data;
     }
 
-    /** @return array<string,string> field => error */
-    public static function validate(array $data): array
+    /**
+     * Validates and normalizes (phones to "(956) 555-0123") — $data is updated in place.
+     * @return array<string,string> field => error
+     */
+    public static function validate(array &$data): array
     {
         $errors = [];
+        normalize_phones($data, ['phone', 'alt_phone'], $errors);
         if (mb_strlen($data['contact_name']) < 2) {
             $errors['contact_name'] = 'Enter the contact person\'s name.';
         }

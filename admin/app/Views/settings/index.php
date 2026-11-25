@@ -44,7 +44,7 @@ $input = function (string $key, string $label, array $opt = []) use ($v): string
         <?= $input('business_city', 'City', ['col' => 'col-md-4']) ?>
         <?= $input('business_state', 'State', ['col' => 'col-md-4']) ?>
         <?= $input('business_zip', 'ZIP code', ['col' => 'col-md-4']) ?>
-        <?= $input('business_phone', 'Phone', ['type' => 'tel']) ?>
+        <?= $input('business_phone', 'Phone', ['type' => 'tel', 'placeholder' => '(956) 555-0123']) ?>
         <?= $input('business_email', 'Email', ['type' => 'email']) ?>
         <?= $input('business_website', 'Website') ?>
         <?= $input('business_ein', 'EIN (optional)', ['placeholder' => 'XX-XXXXXXX']) ?>

@@ -33,7 +33,7 @@ $sources = array_combine(Client::SOURCES, Client::SOURCES);
             <?= form_field('industry', 'Industry', $v('industry'), ['type' => 'select', 'options' => $industries, 'empty' => '—']) ?>
             <?= form_field('contact_name', 'Contact person', $v('contact_name'), ['required' => true, 'placeholder' => 'First and last name']) ?>
             <?= form_field('contact_title', 'Title / role', $v('contact_title'), ['placeholder' => 'e.g. Owner, Office manager']) ?>
-            <?= form_field('phone', 'Phone', $v('phone'), ['type' => 'tel', 'placeholder' => '(956) 555-0123']) ?>
+            <?= form_field('phone', 'Phone', $v('phone'), ['type' => 'tel']) ?>
             <?= form_field('alt_phone', 'Mobile / other phone', $v('alt_phone'), ['type' => 'tel']) ?>
             <?= form_field('email', 'Email', $v('email'), ['type' => 'email']) ?>
             <?= form_field('preferred_contact', 'Preferred contact method', $v('preferred_contact'), ['type' => 'select', 'options' => Client::CONTACT_METHODS]) ?>

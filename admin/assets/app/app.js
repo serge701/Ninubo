@@ -81,3 +81,49 @@
     if (body) setTimeout(function () { body.focus(); }, 300);
   });
 })();
+
+(function () {
+  'use strict';
+
+  // US phone mask for every <input type="tel"> in the CRM: "(956) 555-0123".
+  // The server normalizes and validates again (us_phone() in app/helpers.php).
+  function formatPhone(digits) {
+    if (digits.length === 0) return '';
+    if (digits.length < 4) return '(' + digits;
+    if (digits.length < 7) return '(' + digits.slice(0, 3) + ') ' + digits.slice(3);
+    return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6, 10);
+  }
+
+  function digitsOf(value) {
+    var d = String(value).replace(/\D/g, '');
+    // Pasted "+1 956 555 0123" / "1-956-..." -> drop the country code.
+    if (d.length === 11 && d.charAt(0) === '1') d = d.slice(1);
+    return d.slice(0, 10);
+  }
+
+  function applyMask(input) {
+    var caret = input.selectionStart == null ? input.value.length : input.selectionStart;
+    // How many digits are before the caret, so it stays in the same place after re-formatting.
+    var digitsBefore = input.value.slice(0, caret).replace(/\D/g, '').length;
+    var formatted = formatPhone(digitsOf(input.value));
+    if (formatted === input.value) return;
+    input.value = formatted;
+
+    var pos = 0;
+    var seen = 0;
+    while (pos < formatted.length && seen < digitsBefore) {
+      if (/\d/.test(formatted.charAt(pos))) seen++;
+      pos++;
+    }
+    if (document.activeElement === input) input.setSelectionRange(pos, pos);
+  }
+
+  document.addEventListener('input', function (e) {
+    if (e.target.matches && e.target.matches('input[type="tel"]')) applyMask(e.target);
+  });
+
+  // Format values already in the form (e.g. older records, or a re-shown form after a validation error).
+  document.querySelectorAll('input[type="tel"]').forEach(function (input) {
+    if (input.value) applyMask(input);
+  });
+})();

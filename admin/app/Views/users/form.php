@@ -53,7 +53,8 @@ $isSelf = !$isNew && (int)$u['id'] === (int)auth_user()['id'];
           </div>
           <div class="col-md-6">
             <label class="form-label" for="phone">Phone</label>
-            <input type="tel" class="form-control" id="phone" name="phone" value="<?= e($val('phone')) ?>">
+            <input type="tel" class="form-control<?= invalid('phone') ?>" id="phone" name="phone" value="<?= e($val('phone')) ?>" inputmode="tel" placeholder="(956) 555-0123">
+            <?php if ($err = field_error('phone')): ?><div class="invalid-feedback"><?= e($err) ?></div><?php endif; ?>
           </div>
           <div class="col-md-6">
             <label class="form-label required" for="role">Role</label>
