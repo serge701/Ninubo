@@ -1,0 +1,96 @@
+NOTA: SALES TAX EN TEXAS Y EL "DATA PROCESSING" (80% GRAVABLE)
+================================================================
+Ninubo CRM - noviembre 2026
+
+Es la forma en que Texas cobra sales tax (impuesto sobre ventas) a servicios
+como el diseño web.
+
+
+1. EN TEXAS CASI NINGÚN SERVICIO PAGA SALES TAX, PERO ALGUNOS SÍ
+-----------------------------------------------------------------
+El sales tax se cobra sobre todo a productos. La mayoría de los servicios están
+exentos, salvo una lista de servicios que la ley sí grava. Uno de ellos se llama
+"data processing services" (servicios de procesamiento de datos).
+
+El Comptroller, la oficina de impuestos de Texas, considera que el diseño, la
+creación, el hosting y el mantenimiento de páginas web son "data processing".
+Lo dice su Regla 3.330 (34 Tex. Admin. Code § 3.330), actualizada en 2025.
+Así que lo que vendemos en los paquetes web sí paga sales tax.
+
+
+2. EL "80%"
+-----------
+La ley tiene un beneficio para estos servicios: el 20% del precio está exento
+y solo el 80% paga impuesto.
+
+En el Valle (McAllen, Edinburg, Mission, Pharr, Brownsville) la tasa es 8.25%:
+6.25% del estado más 2% local.
+
+Ejemplo con el paquete Business de $1,397:
+  - Parte gravable: 80% de $1,397 ............ $1,117.60
+  - Sales tax: 8.25% de $1,117.60 ............ $92.20
+  - Total que paga el cliente ................ $1,489.20
+
+En la práctica es como cobrar 6.6% sobre el precio completo (8.25% x 0.80).
+
+Ejemplo con Website Care Pro de $99/mes:
+  - Parte gravable: 80% de $99 ............... $79.20
+  - Sales tax: 8.25% de $79.20 ............... $6.53
+  - Total al mes ............................. $105.53
+
+
+3. QUIÉN PAGA Y QUIÉN ENTREGA EL DINERO
+---------------------------------------
+- El cliente paga el impuesto; va sumado en el invoice, aparte del precio del
+  paquete.
+- Nuestro negocio lo cobra y lo entrega al Comptroller (mensual, trimestral o
+  anual, según cuánto se venda).
+- Para cobrarlo se necesita un Texas Sales and Use Tax Permit. Es gratuito y se
+  tramita con el Comptroller. En el CRM, Business settings tiene un campo para
+  ese número.
+
+
+4. CÓMO LO USA EL CRM
+---------------------
+Cada paquete o servicio del catálogo tiene uno de tres tratamientos fiscales:
+
+  - Data processing: paga impuesto sobre el 80%. Paquetes web, hosting y
+    mantenimiento.
+  - Taxable 100%: paga impuesto sobre el precio completo. Por ejemplo, vender
+    software empaquetado.
+  - Not taxable: no paga impuesto. Por ejemplo, la capacitación, que por lo
+    general no está gravada.
+
+Además, la ficha de cada cliente tiene "Tax exempt", para clientes con
+certificado de exención (iglesias, organizaciones sin fines de lucro, etc.):
+a ellos no se les cobra impuesto.
+
+El invoice hará el cálculo solo con estas reglas: subtotal, parte gravable,
+tasa y total.
+
+La tasa (8.25%) y el porcentaje gravable (80%) se cambian en el CRM en
+Business settings. Si el contador indica otra cosa, se ajusta ahí sin tocar
+código.
+
+
+5. PENDIENTE DE CONFIRMAR CON EL CONTADOR
+-----------------------------------------
+- Servicios sin código: la redacción de textos (copywriting) o la traducción
+  podrían no ser "data processing", y entonces no pagarían impuesto. Depende de
+  cómo se presten. Hoy en el catálogo están como "data processing".
+- Posible cambio en la regla: en octubre de 2026 se publicó una propuesta para
+  modificar la Regla 3.330. No se encontró que ya esté aprobada ni si afecta al
+  diseño web.
+
+Esto es una orientación general, no asesoría fiscal. Antes de emitir el primer
+invoice conviene que el contador confirme el tratamiento de cada servicio.
+
+
+FUENTES
+-------
+- 34 Tex. Admin. Code § 3.330 - Data Processing Services:
+  https://www.law.cornell.edu/regulations/texas/34-Tex-Admin-Code-SS-3.330
+- Texas Register, reformas adoptadas (28 mar 2025):
+  https://www.sos.texas.gov/texreg/archive/March282025/Adopted%20Rules/34.PUBLIC%20FINANCE.html
+- Texas Register, propuesta de reforma (16 oct 2026):
+  https://www.sos.state.tx.us/texreg/archive/October162026/Proposed%20Rules/34.PUBLIC%20FINANCE.html
