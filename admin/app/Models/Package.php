@@ -10,16 +10,20 @@ use Crm\Core\Settings;
 final class Package
 {
     public const CATEGORIES = [
-        'website' => 'Website', 'hosting' => 'Hosting', 'maintenance' => 'Maintenance', 'software' => 'Custom software',
-        'data' => 'Data & BI', 'marketing' => 'Marketing / SEO', 'training' => 'Training', 'other' => 'Other',
+        'website' => 'Website package', 'addon' => 'Add-on service', 'maintenance' => 'Care plan (monthly)',
+        'hosting' => 'Hosting', 'marketing' => 'Marketing / SEO', 'software' => 'Custom software',
+        'data' => 'Data & BI', 'training' => 'Training', 'other' => 'Other',
     ];
+    /** fixed = exact price; from = "From $X" (quoted per project); range = "$X – $Y" (suggested range). */
+    public const PRICE_TYPES = ['fixed' => 'Fixed price', 'from' => 'Starting at ("From $…")', 'range' => 'Price range'];
     public const BILLING = ['one_time' => 'One-time', 'monthly' => 'Monthly', 'yearly' => 'Yearly'];
     public const BILLING_SUFFIX = ['one_time' => '', 'monthly' => '/mo', 'yearly' => '/yr'];
 
     /** Texas sales-tax treatment. data_processing uses the "taxable portion" from Settings (80%). */
     public static function taxTypes(): array
     {
-        $pct = rtrim(rtrim(Settings::get('sales_tax_taxable_pct'), '0'), '.');
+        // 80 -> "80", 80.50 -> "80.5" (only trim decimals, never the integer part).
+        $pct = (string)(float)Settings::get('sales_tax_taxable_pct');
         return [
             'data_processing' => "Data processing — taxed on {$pct}%",
             'taxable' => 'Taxable — 100%',
@@ -68,13 +72,23 @@ final class Package
 
     public static function fromInput(array $in): array
     {
-        $price = str_replace([',', '$', ' '], '', (string)($in['price'] ?? '0'));
+        $money = function (mixed $v, bool $nullable): ?float {
+            $v = str_replace([',', '$', ' '], '', (string)$v);
+            if ($v === '' && $nullable) {
+                return null;
+            }
+            return is_numeric($v) ? round((float)$v, 2) : -1;
+        };
         $profile = (string)($in['brief_profile'] ?? '');
+        $priceType = isset(self::PRICE_TYPES[$in['price_type'] ?? '']) ? $in['price_type'] : 'fixed';
         return [
             'name' => trim((string)($in['name'] ?? '')),
             'category' => isset(self::CATEGORIES[$in['category'] ?? '']) ? $in['category'] : 'other',
             'description' => trim((string)($in['description'] ?? '')),
-            'price' => is_numeric($price) ? round((float)$price, 2) : -1,
+            'price' => $money($in['price'] ?? '0', false),
+            'price_type' => $priceType,
+            'price_max' => $priceType === 'range' ? $money($in['price_max'] ?? '', true) : null,
+            'internal_cost' => $money($in['internal_cost'] ?? '', true),
             'billing' => isset(self::BILLING[$in['billing'] ?? '']) ? $in['billing'] : 'one_time',
             'tax_type' => array_key_exists($in['tax_type'] ?? '', self::taxTypes()) ? $in['tax_type'] : 'data_processing',
             'brief_profile' => isset(ninubo_brief_profiles()[$profile]) ? $profile : null,
@@ -92,11 +106,34 @@ final class Package
         if ($data['price'] < 0 || $data['price'] > 9999999) {
             $errors['price'] = 'Enter a valid price.';
         }
+        if ($data['price_type'] === 'range' && ($data['price_max'] === null || $data['price_max'] <= $data['price'])) {
+            $errors['price_max'] = 'Enter a maximum higher than the starting price.';
+        }
+        if ($data['internal_cost'] !== null && $data['internal_cost'] < 0) {
+            $errors['internal_cost'] = 'Enter a valid amount or leave it blank.';
+        }
         return $errors;
     }
 
+    /** "$1,397", "$59/mo", "From $2,500", "$200 – $400". Whole dollars when there are no cents. */
     public static function priceLabel(array $p): string
     {
-        return money($p['price']) . (self::BILLING_SUFFIX[$p['billing']] ?? '');
+        $fmt = fn($n) => fmod((float)$n, 1.0) === 0.0 ? '$' . number_format((float)$n) : money($n);
+        $suffix = self::BILLING_SUFFIX[$p['billing']] ?? '';
+        return match ($p['price_type'] ?? 'fixed') {
+            'from' => 'From ' . $fmt($p['price']) . $suffix,
+            'range' => $fmt($p['price']) . ' – ' . $fmt($p['price_max']) . $suffix,
+            default => $fmt($p['price']) . $suffix,
+        };
+    }
+
+    /** Commercial margin over the internal production cost, or null when no cost is set. */
+    public static function margin(array $p): ?array
+    {
+        if ($p['internal_cost'] === null || (float)$p['price'] <= 0) {
+            return null;
+        }
+        $amount = (float)$p['price'] - (float)$p['internal_cost'];
+        return ['amount' => $amount, 'pct' => $amount / (float)$p['price'] * 100];
     }
 }

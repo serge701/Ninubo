@@ -134,11 +134,26 @@ function ninubo_brief_schema_raw(): array {
         ],
 
         'estructura_sitio' => [
-            'except' => ['landing'],
-            'title' => $bt('Páginas del sitio', 'Site pages'),
-            'desc' => $bt('Indique qué páginas desea incluir.', 'Indicate which pages you want to include.'),
+            'title' => $bt('Estructura del sitio', 'Site structure'),
+            'desc' => $bt('Indique qué secciones o páginas desea incluir.', 'Indicate which sections or pages you want to include.'),
             'fields' => [
-                'paginas_sitio' => ['type' => 'checkboxes', 'label' => $bt('Páginas a incluir', 'Pages to include'), 'other' => true, 'options' => [
+                // Starter: una sola página con hasta 5 secciones.
+                'secciones_landing' => ['only' => ['landing'], 'type' => 'checkboxes', 'label' => $bt('Secciones de su página', 'Sections of your page'), 'hint' => $bt('Su paquete Starter es una página con hasta 5 secciones. Elija las 5 más importantes; secciones adicionales se pueden cotizar.', 'Your Starter package is one page with up to 5 sections. Choose the 5 most important; extra sections can be quoted.'), 'other' => true, 'options' => [
+                    'hero' => $bt('Portada con mensaje principal', 'Hero with main message'),
+                    'about' => $bt('Sobre nosotros', 'About us'),
+                    'services' => $bt('Servicios', 'Services'),
+                    'gallery' => $bt('Galería / trabajos realizados', 'Gallery / past work'),
+                    'reviews' => $bt('Reseñas / testimonios', 'Reviews / testimonials'),
+                    'faq' => $bt('Preguntas frecuentes', 'FAQ'),
+                    'service_area' => $bt('Área de servicio / mapa', 'Service area / map'),
+                    'contact' => $bt('Contacto con formulario', 'Contact with form'),
+                ]],
+                'paginas_sitio' => ['except' => ['landing'], 'type' => 'checkboxes', 'label' => $bt('Páginas a incluir', 'Pages to include'),
+                    'hint_by_profile' => [
+                        'business' => $bt('Su paquete Business incluye hasta 7 páginas. Páginas adicionales: US$100 c/u.', 'Your Business package includes up to 7 pages. Additional pages: US$100 each.'),
+                        'premium' => $bt('Su paquete Premium incluye hasta 12 páginas. Páginas adicionales: US$100 c/u.', 'Your Premium package includes up to 12 pages. Additional pages: US$100 each.'),
+                    ],
+                    'other' => true, 'options' => [
                     'home' => $bt('Home / Inicio', 'Home'),
                     'about' => $bt('About Us / Nosotros', 'About Us'),
                     'services' => $bt('Services / Servicios', 'Services'),
@@ -201,7 +216,6 @@ function ninubo_brief_schema_raw(): array {
         ],
 
         'google_reviews' => [
-            'except' => ['landing'],
             'title' => $bt('Google y reseñas', 'Google and reviews'),
             'desc' => $bt('Presencia en Google, testimonios y palabras clave.', 'Google presence, testimonials, and keywords.'),
             'fields' => [
@@ -252,7 +266,13 @@ function ninubo_brief_schema_raw(): array {
             'title' => $bt('Idioma, dominio y hosting', 'Language, domain, and hosting'),
             'desc' => $bt('Datos técnicos para poner en línea tu sitio.', 'Technical details to get your site online.'),
             'fields' => [
-                'idioma_sitio' => ['type' => 'radio', 'label' => $bt('¿Qué idioma desea utilizar en el sitio?', 'Which language do you want the site to use?'), 'options' => [
+                'idioma_sitio' => ['type' => 'radio', 'label' => $bt('¿Qué idioma desea utilizar en el sitio?', 'Which language do you want the site to use?'),
+                    'hint_by_profile' => [
+                        'landing' => $bt('El paquete Starter es en un idioma. La versión bilingüe se puede agregar (US$200–400).', 'The Starter package is in one language. A bilingual version can be added (US$200–400).'),
+                        'business' => $bt('Su paquete incluye versión bilingüe Inglés/Español.', 'Your package includes a bilingual English/Spanish version.'),
+                        'premium' => $bt('Su paquete incluye versión bilingüe Inglés/Español.', 'Your package includes a bilingual English/Spanish version.'),
+                    ],
+                    'options' => [
                     'en' => $bt('English', 'English'), 'es' => $bt('Español', 'Spanish'), 'bilingue' => $bt('English + Español', 'English + Spanish'),
                 ]],
                 'idioma_principal' => ['type' => 'radio', 'label' => $bt('Idioma principal (si el sitio será bilingüe)', 'Primary language (if the site will be bilingual)'), 'options' => [
@@ -335,6 +355,47 @@ function ninubo_brief_schema_raw(): array {
             ],
         ],
 
+        'premium' => [
+            'only' => ['premium'],
+            'title' => $bt('Funciones Premium', 'Premium features'),
+            'desc' => $bt('Blog, formularios avanzados, integraciones, SEO local y animaciones incluidos en su paquete.', 'Blog, advanced forms, integrations, local SEO, and animations included in your package.'),
+            'fields' => [
+                'blog_quien_escribe' => ['type' => 'radio', 'label' => $bt('Blog / noticias: ¿quién escribirá los artículos?', 'Blog / news: who will write the articles?'), 'options' => [
+                    'cliente' => $bt('Nosotros (el negocio)', 'We will (the business)'),
+                    'ninubo' => $bt('Quisiera cotizar redacción profesional', 'I\'d like a quote for professional writing'),
+                    'mixto' => $bt('Una combinación', 'A combination'),
+                ]],
+                'blog_temas' => ['type' => 'textarea', 'label' => $bt('Temas sobre los que le gustaría publicar', 'Topics you would like to publish about'), 'hint' => $bt('Ejemplo: consejos de mantenimiento de techos, proyectos recientes, temporada de huracanes.', 'Example: roof maintenance tips, recent projects, hurricane season.')],
+                'formularios_avanzados' => ['type' => 'checkboxes', 'label' => $bt('¿Qué formularios avanzados necesita?', 'Which advanced forms do you need?'), 'other' => true, 'options' => [
+                    'cotizacion' => $bt('Solicitud de cotización por pasos', 'Multi-step quote request'),
+                    'citas' => $bt('Solicitud de cita', 'Appointment request'),
+                    'archivos' => $bt('Envío de fotos o archivos', 'Photo / file upload'),
+                    'empleo' => $bt('Solicitud de empleo', 'Job application'),
+                    'encuesta' => $bt('Encuesta / evaluación', 'Survey / assessment'),
+                ]],
+                'integraciones' => ['type' => 'checkboxes', 'label' => $bt('¿Con qué herramientas debe conectarse el sitio?', 'Which tools should the site connect to?'), 'other' => true, 'hint' => $bt('Incluye integraciones externas básicas; las más complejas se cotizan aparte.', 'Basic external integrations are included; complex ones are quoted separately.'), 'options' => [
+                    'agenda' => $bt('Agenda en línea (Calendly, Square, Google Calendar)', 'Online booking (Calendly, Square, Google Calendar)'),
+                    'crm' => $bt('CRM', 'CRM'),
+                    'email_marketing' => $bt('Email marketing (Mailchimp, etc.)', 'Email marketing (Mailchimp, etc.)'),
+                    'pagos' => $bt('Pagos / depósitos en línea', 'Online payments / deposits'),
+                    'chat' => $bt('Chat en vivo', 'Live chat'),
+                    'resenas_widget' => $bt('Widget de reseñas de Google', 'Google reviews widget'),
+                ]],
+                'herramientas_actuales' => ['type' => 'textarea', 'label' => $bt('¿Qué sistemas usa hoy su negocio?', 'What systems does your business use today?'), 'hint' => $bt('Nombre del programa y para qué lo usa. Nos ayuda a planear las integraciones.', 'Program name and what you use it for. It helps us plan the integrations.')],
+                'seo_local_ciudades' => ['type' => 'textarea', 'label' => $bt('SEO local: ciudades prioritarias, en orden de importancia', 'Local SEO: priority cities, in order of importance'), 'hint' => $bt('Ejemplo: McAllen, Edinburg, Mission, Pharr, Weslaco, Harlingen, Brownsville.', 'Example: McAllen, Edinburg, Mission, Pharr, Weslaco, Harlingen, Brownsville.')],
+                'gbp_acceso' => ['type' => 'radio', 'label' => $bt('¿Puede darnos acceso a su Google Business Profile?', 'Can you give us access to your Google Business Profile?'), 'options' => [
+                    'si' => $bt('Sí', 'Yes'),
+                    'no_tengo' => $bt('No tengo perfil, necesito crearlo', 'I don\'t have one, I need to create it'),
+                    'no_se' => $bt('No sé cómo / necesito ayuda', 'I don\'t know how / need help'),
+                ]],
+                'animaciones' => ['type' => 'radio', 'label' => $bt('¿Qué nivel de animaciones y efectos prefiere?', 'What level of animations and effects do you prefer?'), 'options' => [
+                    'sutil' => $bt('Sutil y profesional', 'Subtle and professional'),
+                    'moderado' => $bt('Moderado, que llame la atención', 'Moderate, eye-catching'),
+                    'llamativo' => $bt('Muy dinámico', 'Very dynamic'),
+                ]],
+            ],
+        ],
+
         'funcionalidades_legal' => [
             'except' => ['landing'],
             'title' => $bt('Funcionalidades y legal', 'Features and legal'),
@@ -405,12 +466,14 @@ function ninubo_brief_schema_raw(): array {
  * elige uno, y el cliente solo ve las preguntas de ese perfil.
  *  - Un paso o campo con 'only' => [...] aparece solo para esos perfiles.
  *  - Un paso o campo con 'except' => [...] se oculta para esos perfiles.
+ *  - Un campo con 'hint_by_profile' => [perfil => texto] cambia su ayuda según el paquete.
  *  - Sin perfil (briefs anteriores a los perfiles) = todo lo que no tiene 'only' (igual que 'business').
  */
 function ninubo_brief_profiles(): array {
     return [
-        'landing' => 'Landing page (one page)',
-        'business' => 'Business website (multi-page)',
+        'landing' => 'Starter — landing page',
+        'business' => 'Business website',
+        'premium' => 'Premium website',
         'ecommerce' => 'Online store',
     ];
 }
@@ -440,6 +503,16 @@ function ninubo_brief_schema(string $lang = 'es', ?string $profile = null): arra
             continue;
         }
         $step['fields'] = array_filter($step['fields'], fn($field) => ninubo_brief_applies($field, $profile));
+        // 'hint_by_profile' => [perfil => texto] reemplaza el hint según el paquete del cliente.
+        foreach ($step['fields'] as $fieldName => $field) {
+            if (isset($field['hint_by_profile'])) {
+                if ($profile !== null && isset($field['hint_by_profile'][$profile])) {
+                    $field['hint'] = $field['hint_by_profile'][$profile];
+                }
+                unset($field['hint_by_profile']);
+                $step['fields'][$fieldName] = $field;
+            }
+        }
         unset($step['only'], $step['except']);
         $resolvedStep = $step;
         $resolvedStep['title'] = ninubo_brief_resolve_text($step['title'], $lang);

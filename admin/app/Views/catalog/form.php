@@ -3,8 +3,9 @@ use Crm\Core\View;
 use Crm\Models\Package;
 
 $isNew = $package === null;
-$p = $package ?? ['name' => '', 'category' => 'website', 'description' => '', 'price' => '0.00', 'billing' => 'one_time',
-    'tax_type' => 'data_processing', 'brief_profile' => null, 'is_active' => 1, 'sort_order' => 0];
+$p = $package ?? ['name' => '', 'category' => 'website', 'description' => '', 'price' => '0.00', 'price_type' => 'fixed',
+    'price_max' => null, 'internal_cost' => null, 'billing' => 'one_time', 'tax_type' => 'data_processing',
+    'brief_profile' => null, 'is_active' => 1, 'sort_order' => 0];
 $v = fn(string $k) => old($k, $p[$k] ?? '');
 
 $profiles = ['' => 'No brief (not a website build)'];
@@ -25,8 +26,11 @@ foreach (ninubo_brief_profiles() as $key => $label) {
           <?= form_field('name', 'Name', $v('name'), ['required' => true, 'col' => 'col-md-8', 'placeholder' => 'e.g. Business Website']) ?>
           <?= form_field('category', 'Category', $v('category'), ['type' => 'select', 'col' => 'col-md-4', 'options' => Package::CATEGORIES]) ?>
           <?= form_field('description', 'Description', $v('description'), ['type' => 'textarea', 'col' => 'col-12', 'rows' => 4, 'hint' => 'What is included. Printed on invoices and used as the scope of work in contracts — write it for the client.']) ?>
-          <?= form_field('price', 'Price', $v('price'), ['type' => 'number', 'step' => '0.01', 'col' => 'col-md-4', 'prefix' => '$', 'required' => true]) ?>
+          <?= form_field('price_type', 'Pricing', $v('price_type'), ['type' => 'select', 'col' => 'col-md-4', 'options' => Package::PRICE_TYPES]) ?>
+          <?= form_field('price', 'Price (or starting price)', $v('price'), ['type' => 'number', 'step' => '0.01', 'col' => 'col-md-4', 'prefix' => '$', 'required' => true]) ?>
+          <?= form_field('price_max', 'Maximum price', (string)$v('price_max'), ['type' => 'number', 'step' => '0.01', 'col' => 'col-md-4', 'prefix' => '$', 'hint' => 'Only for price ranges, e.g. $200 – $400.']) ?>
           <?= form_field('billing', 'Billing', $v('billing'), ['type' => 'select', 'col' => 'col-md-4', 'options' => Package::BILLING]) ?>
+          <?= form_field('internal_cost', 'Production cost (internal)', (string)$v('internal_cost'), ['type' => 'number', 'step' => '0.01', 'col' => 'col-md-4', 'prefix' => '$', 'hint' => 'Partner price paid for production. Admin-only; used to show the margin.']) ?>
           <?= form_field('sort_order', 'Sort order', $v('sort_order'), ['type' => 'number', 'col' => 'col-md-4', 'hint' => 'Lower numbers show first.']) ?>
           <?= form_field('tax_type', 'Texas sales tax', $v('tax_type'), ['type' => 'select', 'col' => 'col-md-6', 'options' => Package::taxTypes(), 'hint' => 'Web design, hosting and maintenance are data processing services. Training is usually not taxable. Confirm with your CPA.']) ?>
           <?= form_field('brief_profile', 'Website brief', (string)$v('brief_profile'), ['type' => 'select', 'col' => 'col-md-6', 'options' => $profiles, 'hint' => 'Which questions the client answers when you send them a brief for this package.']) ?>
@@ -44,9 +48,10 @@ foreach (ninubo_brief_profiles() as $key => $label) {
     <div class="card">
       <div class="card-header"><h3 class="card-title">Brief profiles</h3></div>
       <div class="card-body small">
-        <p><strong>Landing page</strong> — business info, services, home message, visuals, contact, domain and design basics.</p>
-        <p><strong>Business website</strong> — everything: ideal customer, pages, about us, Google &amp; reviews, SEO, competitors, features and legal.</p>
-        <p class="mb-0"><strong>Online store</strong> — the business website questions plus products, payments, shipping, inventory and returns.</p>
+        <p><strong>Starter — landing page</strong> — business info, services, up to 5 page sections, visuals, Google &amp; reviews, contact, domain and design basics.</p>
+        <p><strong>Business website</strong> — everything: ideal customer, pages (up to 7), about us, Google &amp; SEO, competitors, features and legal.</p>
+        <p><strong>Premium website</strong> — the business questions plus blog, advanced forms, integrations, local SEO cities, Google Business Profile access and animations.</p>
+        <p class="mb-0"><strong>Online store</strong> — the business questions plus products, payments, shipping, inventory and returns.</p>
       </div>
     </div>
     <?php if (!$isNew): ?>

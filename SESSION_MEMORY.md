@@ -48,6 +48,11 @@
     profile; 5 starter items at $0.00), briefs created from client + package with per-package questions (landing 9 steps,
     business 13, ecommerce 14 incl. new "Online store" step), dashboard with leads/active/follow-ups. The 2 pre-CRM briefs
     are not linked to a client (shown as "Not linked to a client", full questionnaire).
+  - Catalog loaded from the "Ninubo 360" partnership proposal (migration 05): Starter $697, Business $1,397,
+    Premium $2,697 (with internal production cost / margin, admin-only), Online Store from $2,500, Website Redesign from
+    $700, add-ons (fixed, "from" and range prices) and monthly care plans ($59 / $99 / $199). New brief profile
+    `premium` (extra "Premium features" step); Starter asks for up to 5 page sections; per-package hints
+    (`hint_by_profile`) for pages included and bilingual.
   - Next phases: 3) invoices + payments + PDF (Dompdf), 4) contracts with English RGV template + e-signature link + PDF,
     5) dashboard KPIs.
 
