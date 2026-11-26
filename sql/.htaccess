@@ -1,2 +1,8 @@
-# Solo se incluye desde PHP; nunca debe servirse por web.
-Require all denied
+# Solo se usa desde PHP; nunca se sirve por web (Apache 2.4 y LiteSpeed).
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

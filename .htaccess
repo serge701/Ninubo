@@ -3,21 +3,35 @@ DirectoryIndex index.php index.html
 # No listar el contenido de carpetas sin index.
 Options -Indexes
 
-# --- Archivos internos que no deben servirse por web ---------------------
-# Notas de desarrollo, esquemas SQL, logs/volcados y cualquier .txt salvo
-# robots.txt (p.ej. crash.txt de sendmail, assets/img/README.txt).
-<FilesMatch "\.(md|sql|log|bak|ini|env|dist)$">
-    Require all denied
-</FilesMatch>
-<FilesMatch "^(?!robots\.txt$).+\.txt$">
-    Require all denied
-</FilesMatch>
-# Archivos ocultos (.htaccess, .git, .env, etc.)
-<FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
+# Compatible con Apache 2.4 (XAMPP) y LiteSpeed (HostGator): se usan reglas de
+# reescritura [F] (funcionan en ambos) y además bloques Require / Deny.
 
-# --- Carpetas que solo se incluyen desde PHP, nunca por URL ---------------
-# (includes/ y sql/ también tienen su propio .htaccess con "Require all
-# denied" por si este bloque se pierde al subir el sitio.)
-RedirectMatch 404 ^/(.*/)?(includes|sql)(/.*)?$
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Validación de certificados SSL (AutoSSL / Let's Encrypt): siempre accesible.
+RewriteRule ^\.well-known/ - [L]
+
+# Carpetas y archivos ocultos: .git/ (el sitio se despliega con Git), .env, .htaccess…
+# (se permite .well-known/ para la validación de certificados SSL).
+RewriteRule (^|/)\.(?!well-known(/|$)) - [F,L]
+
+# Carpetas que solo se incluyen desde PHP, nunca por URL.
+RewriteRule ^(includes|sql|docs)(/|$) - [F,L]
+
+# Notas, esquemas SQL, logs, respaldos y cualquier .txt salvo robots.txt.
+RewriteRule \.(md|sql|log|bak|ini|env|dist|sh|lock|bundle)$ - [F,L,NC]
+RewriteCond %{REQUEST_URI} !(^|/)robots\.txt$ [NC]
+RewriteRule \.txt$ - [F,L,NC]
+</IfModule>
+
+# Respaldo por si mod_rewrite no estuviera disponible.
+<FilesMatch "(^\.|\.(md|sql|log|bak|ini|env|dist|sh|lock|bundle)$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
