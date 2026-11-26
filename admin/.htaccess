@@ -5,6 +5,7 @@ RewriteEngine On
 
 # Internal folders are never served by URL (each also has its own "Require all denied").
 RewriteRule ^(app|database|scripts|storage|vendor)(/|$) - [F,L]
+RewriteRule ^composer.(json|lock)$ - [F,L]
 
 # Real files (Tabler, app CSS/JS) are served as-is; everything else goes to the front controller.
 RewriteCond %{REQUEST_FILENAME} -f

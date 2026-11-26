@@ -14,7 +14,11 @@ final class SettingsController extends Controller
 
     public function show(): void
     {
-        $this->view('settings/index', ['title' => 'Business settings', 's' => Settings::all()]);
+        $this->view('settings/index', [
+            'title' => 'Business settings',
+            's' => Settings::all(),
+            'yearlyItems' => array_values(array_filter(\Crm\Models\Package::all(true), fn($p) => $p['billing'] === 'yearly')),
+        ]);
     }
 
     public function update(): void
@@ -39,6 +43,9 @@ final class SettingsController extends Controller
             if (!is_numeric($v) || (float)$v < $min || (float)$v > $max) {
                 $errors[$key] = "Enter a number between {$min} and {$max}.";
             }
+        }
+        if (($values['website_renewal_package_id'] ?? '') !== '' && !ctype_digit($values['website_renewal_package_id'])) {
+            $values['website_renewal_package_id'] = '';
         }
         foreach (['invoice_due_days', 'invoice_next_number', 'contract_next_number'] as $key) {
             if (!ctype_digit($values[$key] ?? '')) {

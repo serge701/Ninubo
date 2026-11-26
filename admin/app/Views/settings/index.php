@@ -83,6 +83,13 @@ $input = function (string $key, string $label, array $opt = []) use ($v): string
         <?= $input('sales_tax_rate', 'Sales tax rate', ['col' => 'col-md-4', 'type' => 'number', 'step' => '0.001', 'suffix' => '%', 'hint' => 'Combined state + local rate. McAllen, Edinburg, Mission, Pharr, Brownsville: 8.25%.']) ?>
         <?= $input('sales_tax_taxable_pct', 'Taxable portion of taxable services', ['col' => 'col-md-4', 'type' => 'number', 'step' => '1', 'suffix' => '%', 'hint' => 'Texas taxes data processing services (web design, hosting, maintenance) on 80% of the charge. Each catalog item will be marked taxable or not.']) ?>
         <?= $input('texas_sales_tax_permit', 'Texas sales tax permit #', ['col' => 'col-md-4', 'hint' => 'Required before collecting sales tax.']) ?>
+        <?php
+        $renewalOptions = ['' => 'None — don\'t schedule a renewal'];
+        foreach ($yearlyItems as $item) {
+            $renewalOptions[(string)$item['id']] = $item['name'] . ' — ' . \Crm\Models\Package::priceLabel($item);
+        }
+        ?>
+        <?= form_field('website_renewal_package_id', 'Yearly renewal for website packages', (string)$v('website_renewal_package_id'), ['type' => 'select', 'col' => 'col-md-6', 'options' => $renewalOptions, 'hint' => 'Domain and hosting are included for the first year. When an invoice with a website package is issued, this service is scheduled one year later on the client\'s Recurring services.']) ?>
         <?= $input('invoice_payment_instructions', 'Payment instructions', ['col' => 'col-md-6', 'type' => 'textarea', 'rows' => 4, 'placeholder' => "Zelle: payments@...\nCheck payable to: ...\nBank transfer: ..."]) ?>
         <?= $input('invoice_footer', 'Invoice footer note', ['col' => 'col-md-6', 'type' => 'textarea', 'rows' => 4]) ?>
       </div>

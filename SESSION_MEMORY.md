@@ -53,8 +53,14 @@
     $700, add-ons (fixed, "from" and range prices) and monthly care plans ($59 / $99 / $199). New brief profile
     `premium` (extra "Premium features" step); Starter asks for up to 5 page sections; per-package hints
     (`hint_by_profile`) for pages included and bilingual.
-  - Next phases: 3) invoices + payments + PDF (Dompdf), 4) contracts with English RGV template + e-signature link + PDF,
-    5) dashboard KPIs.
+  - Phase 3 (done): invoices from the client page (quick pickers for website package + monthly care plan, catalog
+    add-ons, custom lines), live totals with Texas tax rules, payment terms 50/50 or 40/30/30 (> $2,000) or full,
+    draft → issue (INV-####) → payments (partial/paid, first payment turns a Lead into Active) → void (admin).
+    Downloadable PDF (Dompdf, committed in admin/vendor). Recurring services per client with "Invoice next period";
+    yearly Domain & Hosting Renewal scheduled automatically (catalog item, **price still $0 — owner must set it**).
+    Owner decisions: blog & booking only in Premium; Business delivery 10–15 business days; domain + hosting
+    included for the first year, renewed yearly.
+  - Next phases: 4) contracts with English RGV template + e-signature link + PDF, 5) dashboard KPIs.
 
 ## Important follow-ups
 

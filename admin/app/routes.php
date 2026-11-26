@@ -7,6 +7,8 @@ use Crm\Controllers\BriefController;
 use Crm\Controllers\CatalogController;
 use Crm\Controllers\ClientController;
 use Crm\Controllers\DashboardController;
+use Crm\Controllers\InvoiceController;
+use Crm\Controllers\SubscriptionController;
 use Crm\Controllers\ProfileController;
 use Crm\Controllers\SettingsController;
 use Crm\Controllers\SetupController;
@@ -41,6 +43,23 @@ $router->post('/clients/{id}/delete', [ClientController::class, 'destroy'], $adm
 $router->post('/clients/{id}/activities', [ActivityController::class, 'store']);
 $router->post('/activities/{id}/toggle', [ActivityController::class, 'toggle']);
 $router->post('/activities/{id}/delete', [ActivityController::class, 'destroy']);
+
+// Invoices (created from a client) and recurring services
+$router->get('/invoices', [InvoiceController::class, 'index']);
+$router->get('/clients/{id}/invoices/new', [InvoiceController::class, 'create']);
+$router->post('/invoices', [InvoiceController::class, 'store']);
+$router->get('/invoices/{id}', [InvoiceController::class, 'show']);
+$router->get('/invoices/{id}/edit', [InvoiceController::class, 'edit']);
+$router->post('/invoices/{id}', [InvoiceController::class, 'update']);
+$router->post('/invoices/{id}/issue', [InvoiceController::class, 'issue']);
+$router->get('/invoices/{id}/pdf', [InvoiceController::class, 'pdf']);
+$router->post('/invoices/{id}/payments', [InvoiceController::class, 'recordPayment']);
+$router->post('/payments/{id}/delete', [InvoiceController::class, 'deletePayment'], $admin);
+$router->post('/invoices/{id}/void', [InvoiceController::class, 'void'], $admin);
+$router->post('/invoices/{id}/delete', [InvoiceController::class, 'destroy']);
+$router->post('/subscriptions/{id}/invoice', [SubscriptionController::class, 'invoice']);
+$router->post('/subscriptions/{id}', [SubscriptionController::class, 'update']);
+$router->post('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel']);
 
 // Packages & services catalog (view: everyone, edit: admin)
 $router->get('/catalog', [CatalogController::class, 'index']);

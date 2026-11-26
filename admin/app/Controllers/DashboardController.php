@@ -9,6 +9,8 @@ use Crm\Core\Settings;
 use Crm\Models\Activity;
 use Crm\Models\Brief;
 use Crm\Models\Client;
+use Crm\Models\Invoice;
+use Crm\Models\Subscription;
 
 final class DashboardController extends Controller
 {
@@ -28,6 +30,9 @@ final class DashboardController extends Controller
             'userCount' => (int)Database::value('SELECT COUNT(*) FROM users WHERE is_active = 1'),
             'businessConfigured' => $settings['business_address1'] !== '' && $settings['business_phone'] !== '',
             'catalogPriced' => !(int)Database::value('SELECT COUNT(*) FROM packages WHERE is_active = 1 AND price <= 0'),
+            'invoiceSummary' => Invoice::summary(),
+            'recurringDue' => Subscription::dueWithin(14),
+            'mrr' => Subscription::mrr(),
         ]);
     }
 }

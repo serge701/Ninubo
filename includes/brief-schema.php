@@ -150,7 +150,7 @@ function ninubo_brief_schema_raw(): array {
                 ]],
                 'paginas_sitio' => ['except' => ['landing'], 'type' => 'checkboxes', 'label' => $bt('Páginas a incluir', 'Pages to include'),
                     'hint_by_profile' => [
-                        'business' => $bt('Su paquete Business incluye hasta 7 páginas. Páginas adicionales: US$100 c/u.', 'Your Business package includes up to 7 pages. Additional pages: US$100 each.'),
+                        'business' => $bt('Su paquete Business incluye hasta 7 páginas (páginas adicionales: US$100 c/u). Blog y reservaciones en línea están incluidos en el paquete Premium.', 'Your Business package includes up to 7 pages (additional pages: US$100 each). Blog and online booking are included in the Premium package.'),
                         'premium' => $bt('Su paquete Premium incluye hasta 12 páginas. Páginas adicionales: US$100 c/u.', 'Your Premium package includes up to 12 pages. Additional pages: US$100 each.'),
                     ],
                     'other' => true, 'options' => [

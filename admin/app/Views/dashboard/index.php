@@ -35,8 +35,49 @@ $setupDone = $businessConfigured && $catalogPriced && $userCount > 1;
   <?php endforeach; ?>
 </div>
 
+<div class="row row-deck row-cards mb-3">
+  <?php foreach ([
+      [url('/invoices?status=open'), money($invoiceSummary['outstanding']), 'Outstanding', 'blue', 'clock-dollar', (int)$invoiceSummary['open_count'] . ' open invoice(s)'],
+      [url('/invoices?status=overdue'), money($invoiceSummary['overdue_amount']), 'Overdue', (int)$invoiceSummary['overdue_count'] ? 'red' : 'secondary', 'alert-triangle', (int)$invoiceSummary['overdue_count'] . ' invoice(s) past due'],
+      [url('/invoices?status=paid'), money($invoiceSummary['paid_this_month']), 'Collected this month', 'green', 'cash', date('F Y')],
+      ['#recurring-due', money($mrr), 'Monthly recurring', 'purple', 'repeat', 'Active care plans & renewals'],
+  ] as [$href, $value, $label, $color, $icon, $sub]): ?>
+  <div class="col-sm-6 col-lg-3">
+    <a class="card card-sm card-link" href="<?= e($href) ?>">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto"><span class="bg-<?= $color ?> text-white avatar"><i class="ti ti-<?= $icon ?>"></i></span></div>
+          <div class="col"><div class="font-weight-medium"><?= e($value) ?> · <?= e($label) ?></div><div class="text-secondary small"><?= e($sub) ?></div></div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <?php endforeach; ?>
+</div>
+
 <div class="row row-cards">
   <div class="col-lg-7">
+    <div class="card mb-3" id="recurring-due">
+      <div class="card-header"><h3 class="card-title">Recurring invoices due in the next 14 days</h3></div>
+      <?php if (!$recurringDue): ?>
+      <div class="card-body text-secondary">Nothing to bill soon.</div>
+      <?php else: ?>
+      <div class="list-group list-group-flush">
+        <?php foreach ($recurringDue as $r): $late = $r['next_invoice_date'] < date('Y-m-d'); ?>
+        <a href="<?= url('/clients/' . (int)$r['client_id']) ?>#recurring" class="list-group-item list-group-item-action">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="fw-medium"><?= e(Client::displayName($r)) ?></div>
+              <div class="small text-secondary"><?= e($r['description']) ?> · <?= e(money($r['unit_price'])) ?>/<?= $r['billing'] === 'yearly' ? 'yr' : 'mo' ?></div>
+            </div>
+            <div class="small <?= $late ? 'text-red fw-medium' : 'text-secondary' ?>"><?= $late ? 'Late since ' : 'Due ' ?><?= e(fmt_date($r['next_invoice_date'])) ?></div>
+          </div>
+        </a>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+    </div>
+
     <div class="card mb-3" id="follow-ups">
       <div class="card-header"><h3 class="card-title">My follow-ups</h3></div>
       <?php if (!$tasks): ?>

@@ -17,6 +17,7 @@ $pendingMigrations = ($me && $me['role'] === 'admin') ? Migrator::pending() : []
 $nav = [
     ['/', 'layout-dashboard', 'Dashboard', false],
     ['/clients', 'address-book', 'Clients', false],
+    ['/invoices', 'file-invoice', 'Invoices', false],
     ['/briefs', 'forms', 'Website briefs', false],
     ['/catalog', 'package', 'Catalog', false],
 ];

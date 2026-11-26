@@ -7,7 +7,9 @@ use Crm\Core\Controller;
 use Crm\Models\Activity;
 use Crm\Models\Brief;
 use Crm\Models\Client;
+use Crm\Models\Invoice;
 use Crm\Models\Package;
+use Crm\Models\Subscription;
 use Crm\Models\User;
 
 /** Clients are the starting point of every sale: briefs, invoices and contracts are created from a client. */
@@ -71,6 +73,8 @@ final class ClientController extends Controller
             'activities' => Activity::forClient((int)$client['id']),
             'briefs' => Brief::forClient((int)$client['id']),
             'briefPackages' => Package::withBrief(),
+            'invoices' => Invoice::forClient((int)$client['id']),
+            'subscriptions' => Subscription::forClient((int)$client['id']),
         ]);
     }
 
@@ -112,6 +116,10 @@ final class ClientController extends Controller
     public function destroy(string $id): void
     {
         $client = Client::find((int)$id) ?? $this->notFound();
+        if (Invoice::countForClient((int)$client['id']) > 0) {
+            \Crm\Core\Session::flash('danger', 'This client has invoices, so it cannot be deleted (accounting records must be kept). Mark the client as Inactive instead.');
+            $this->redirect('/clients/' . $client['id'] . '/edit');
+        }
         Client::delete((int)$client['id']);
         $this->success('Client "' . Client::displayName($client) . '" deleted. Their website briefs were kept.');
         $this->redirect('/clients');

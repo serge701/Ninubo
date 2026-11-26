@@ -29,6 +29,16 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
   created/started/submitted (the public `api/brief-guardar.php` logs those too). Keep doing this for invoices/contracts.
 - Catalog (`packages`): price, billing (one-time/monthly/yearly), `tax_type` (data_processing = taxed on the taxable %
   setting, taxable = 100%, exempt) and `brief_profile`. Items already used can't be deleted, only deactivated.
+- Invoices (`Models\Invoice`): draft (editable, no number) → issue (number from Settings `invoice_next_number`,
+  locked with FOR UPDATE; bill-to snapshot) → partial / paid from payments. Overdue is computed, never stored.
+  Tax: `Invoice::computeTotals()` is the single formula (the form's JS only previews it). Totals, tax rate and
+  taxable % are snapshotted on the invoice — never recompute an issued invoice from current settings.
+  Issued invoices are never edited or deleted; admins void them (number kept). Clients with invoices can't be deleted.
+- Recurring services (`client_subscriptions`): created when an invoice with monthly/yearly lines is issued; a
+  website package also schedules the yearly domain & hosting renewal (Settings `website_renewal_package_id`) one year
+  later. Voiding undoes this (cancels services it started, moves billed periods back).
+- PDF: Dompdf in `admin/vendor/` (installed with Composer, committed so hosting needs no Composer); `Core\Pdf`
+  disables remote fetches and PHP; logo is embedded as a data: URI. Business identity on documents comes from Settings.
 - Website brief questions live only in `includes/brief-schema.php`. Profiles (`ninubo_brief_profiles()`: landing,
   business, ecommerce) filter steps/fields with `'only' => [...]` / `'except' => [...]`; the brief stores the profile at
   creation. Always call `ninubo_brief_schema($lang, $brief['brief_profile'])`.

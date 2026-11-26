@@ -3,6 +3,8 @@ use Crm\Core\View;
 use Crm\Models\Activity;
 use Crm\Models\Brief;
 use Crm\Models\Client;
+use Crm\Models\Invoice;
+use Crm\Models\Subscription;
 
 $id = (int)$client['id'];
 $me = auth_user();
@@ -16,7 +18,7 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
   <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="ti ti-plus me-1"></i>New</button>
   <div class="dropdown-menu dropdown-menu-end">
     <a class="dropdown-item" href="#new-brief" data-bs-toggle="modal"><i class="ti ti-forms dropdown-item-icon"></i>Website brief</a>
-    <span class="dropdown-item disabled"><i class="ti ti-file-invoice dropdown-item-icon"></i>Invoice <span class="badge bg-secondary-lt ms-auto">soon</span></span>
+    <a class="dropdown-item" href="<?= url('/clients/' . $id . '/invoices/new') ?>"><i class="ti ti-file-invoice dropdown-item-icon"></i>Invoice</a>
     <span class="dropdown-item disabled"><i class="ti ti-file-certificate dropdown-item-icon"></i>Contract <span class="badge bg-secondary-lt ms-auto">soon</span></span>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item" href="#activity" data-focus-composer="task"><i class="ti ti-calendar-check dropdown-item-icon"></i>Follow-up</a>
@@ -111,8 +113,88 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><h3 class="card-title"><i class="ti ti-file-invoice me-2"></i>Invoices &amp; contracts</h3></div>
-      <div class="card-body text-secondary small">Invoices and contracts for this client will appear here (next phases).</div>
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-file-invoice me-2"></i>Invoices</h3>
+        <div class="card-actions"><a href="<?= url('/clients/' . $id . '/invoices/new') ?>" class="btn btn-sm"><i class="ti ti-plus me-1"></i>New invoice</a></div>
+      </div>
+      <?php if (!$invoices): ?>
+      <div class="card-body text-secondary">No invoices yet.</div>
+      <?php else: ?>
+      <div class="table-responsive">
+        <table class="table table-vcenter card-table table-sm">
+          <thead><tr><th>Invoice</th><th>Issued</th><th class="text-end">Total</th><th class="text-end">Balance</th><th>Status</th></tr></thead>
+          <tbody>
+          <?php foreach ($invoices as $inv): $st = Invoice::displayStatus($inv); ?>
+            <tr>
+              <td><a href="<?= url('/invoices/' . (int)$inv['id']) ?>" class="fw-medium"><?= e(Invoice::displayNumber($inv)) ?></a></td>
+              <td class="text-secondary"><?= e(fmt_date($inv['issue_date'])) ?></td>
+              <td class="text-end"><?= e(money($inv['total'])) ?></td>
+              <td class="text-end"><?= in_array($inv['status'], ['draft', 'void'], true) ? '—' : e(money(Invoice::balance($inv))) ?></td>
+              <td><?= status_badge($st, Invoice::STATUS_COLORS, Invoice::STATUSES) ?></td>
+            </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+      <?php endif; ?>
+    </div>
+
+    <div class="card mb-3" id="recurring">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-repeat me-2"></i>Recurring services</h3></div>
+      <?php if (!$subscriptions): ?>
+      <div class="card-body text-secondary small">None yet. Care plans and the yearly domain &amp; hosting renewal are added here automatically when an invoice that includes them is issued.</div>
+      <?php else: ?>
+      <div class="list-group list-group-flush">
+        <?php foreach ($subscriptions as $sub):
+          $active = $sub['status'] === 'active';
+          $late = $active && $sub['next_invoice_date'] <= date('Y-m-d');
+          $draftId = $active ? Subscription::pendingDraftId((int)$sub['id']) : null; ?>
+        <div class="list-group-item<?= $active ? '' : ' text-secondary' ?>">
+          <div class="row align-items-center g-2">
+            <div class="col">
+              <div class="fw-medium"><?= e($sub['description']) ?> <?php if (!$active): ?><span class="badge bg-secondary-lt">Cancelled</span><?php endif; ?></div>
+              <div class="small text-secondary">
+                <?= e(money($sub['unit_price'])) ?> / <?= $sub['billing'] === 'yearly' ? 'year' : 'month' ?>
+                <?php if ($active): ?> · next invoice <span class="<?= $late ? 'text-red fw-medium' : '' ?>"><?= e(fmt_date($sub['next_invoice_date'])) ?></span><?php endif; ?>
+                <?php if ((float)$sub['unit_price'] <= 0 && $active): ?> · <span class="text-warning">set the price before billing</span><?php endif; ?>
+              </div>
+            </div>
+            <?php if ($active): ?>
+            <div class="col-auto d-flex gap-1">
+              <?php if ($draftId): ?>
+                <a href="<?= url('/invoices/' . $draftId) ?>" class="btn btn-sm">Open draft</a>
+              <?php else: ?>
+                <form method="post" action="<?= url('/subscriptions/' . (int)$sub['id'] . '/invoice') ?>" class="m-0"><?= csrf_field() ?>
+                  <button class="btn btn-sm<?= $late ? ' btn-primary' : '' ?>"><i class="ti ti-file-plus me-1"></i>Invoice next period</button></form>
+              <?php endif; ?>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-icon" data-bs-toggle="dropdown" aria-label="More"><i class="ti ti-dots-vertical"></i></button>
+                <div class="dropdown-menu dropdown-menu-end p-3" style="min-width:16rem">
+                  <form method="post" action="<?= url('/subscriptions/' . (int)$sub['id']) ?>"><?= csrf_field() ?>
+                    <label class="form-label small">Price</label>
+                    <div class="input-group input-group-sm mb-2"><span class="input-group-text">$</span><input type="number" step="0.01" min="0" class="form-control" name="unit_price" value="<?= e(number_format((float)$sub['unit_price'], 2, '.', '')) ?>"></div>
+                    <label class="form-label small">Next invoice date</label>
+                    <input type="date" class="form-control form-control-sm mb-2" name="next_invoice_date" value="<?= e($sub['next_invoice_date']) ?>">
+                    <button class="btn btn-sm btn-primary w-100">Save</button>
+                  </form>
+                  <hr class="my-2">
+                  <form method="post" action="<?= url('/subscriptions/' . (int)$sub['id'] . '/cancel') ?>" data-confirm="Cancel &quot;<?= e($sub['description']) ?>&quot;? No more invoices will be suggested for it."><?= csrf_field() ?>
+                    <button class="btn btn-sm btn-ghost-danger w-100"><i class="ti ti-x me-1"></i>Cancel service</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-file-certificate me-2"></i>Contracts</h3></div>
+      <div class="card-body text-secondary small">Contracts for this client will appear here (next phase).</div>
     </div>
 
     <div class="card" id="activity">

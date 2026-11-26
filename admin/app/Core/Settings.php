@@ -35,6 +35,7 @@ final class Settings
         'texas_sales_tax_permit' => '',
         'invoice_payment_instructions' => '',
         'invoice_footer' => 'Thank you for your business!',
+        'website_renewal_package_id' => '', // catalog item scheduled yearly when a website package is invoiced
 
         // Contracts
         'contract_prefix' => 'AGR-',
