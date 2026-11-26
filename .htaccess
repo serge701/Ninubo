@@ -16,6 +16,9 @@ RewriteRule ^\.well-known/ - [L]
 # (se permite .well-known/ para la validación de certificados SSL).
 RewriteRule (^|/)\.(?!well-known(/|$)) - [F,L]
 
+# Logs de errores de PHP que el hosting escribe junto a los scripts (HostGator/LiteSpeed: "error_log").
+RewriteRule (^|/)error_log$ - [F,L]
+
 # Carpetas que solo se incluyen desde PHP, nunca por URL.
 RewriteRule ^(includes|sql|docs)(/|$) - [F,L]
 
@@ -26,7 +29,7 @@ RewriteRule \.txt$ - [F,L,NC]
 </IfModule>
 
 # Respaldo por si mod_rewrite no estuviera disponible.
-<FilesMatch "(^\.|\.(md|sql|log|bak|ini|env|dist|sh|lock|bundle)$)">
+<FilesMatch "(^\.|^error_log$|\.(md|sql|log|bak|ini|env|dist|sh|lock|bundle)$)">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

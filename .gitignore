@@ -13,3 +13,6 @@ admin/storage/*
 # Respaldos / dumps que nunca deben subirse
 *.sql.gz
 *.bundle
+
+# Logs de PHP que escribe el hosting (HostGator / LiteSpeed)
+error_log

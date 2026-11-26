@@ -5,7 +5,10 @@ RewriteEngine On
 
 # Internal folders are never served by URL (each also has its own "Require all denied").
 RewriteRule ^(app|database|scripts|storage|vendor)(/|$) - [F,L]
-RewriteRule ^composer.(json|lock)$ - [F,L]
+RewriteRule ^composer\.(json|lock)$ - [F,L]
+# PHP error logs the hosting writes next to scripts (HostGator/LiteSpeed "error_log"), dot files, notes.
+RewriteRule (^|/)(error_log|\.[^/]*)$ - [F,L]
+RewriteRule \.(md|log|sql|txt|sh)$ - [F,L,NC]
 
 # Real files (Tabler, app CSS/JS) are served as-is; everything else goes to the front controller.
 RewriteCond %{REQUEST_FILENAME} -f
