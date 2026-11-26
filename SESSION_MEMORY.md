@@ -81,3 +81,9 @@
 - Configure SMTP for the contact form; PHP `mail()` is not a dependable delivery mechanism by itself. Same applies to the brief-completion notification email. (Not confirmed either way — worth checking if either email has been missing in practice.)
 - Add an approved 1200×630 social-sharing image when available; the current Open Graph image is the NINUBO logo.
 - The workspace is not a Git repository.
+
+## Next idea (not started) — client portal
+- 2026-11-25: owner wants a client-facing portal to see/pay invoices and manage monthly plans. Proposed: Stripe
+  (hosted Checkout + webhook, CRM stays source of truth), passwordless email login, bilingual EN/ES, stages
+  1) base portal 2) online payments 3) autopay/cancellation 4) change requests. Blockers/prereqs: SMTP for email,
+  US business entity for Stripe. Open questions: processor, login method, sending email account, company status.
