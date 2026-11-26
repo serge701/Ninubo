@@ -11,6 +11,7 @@ use Crm\Models\Brief;
 use Crm\Models\Client;
 use Crm\Models\Contract;
 use Crm\Models\Invoice;
+use Crm\Models\Stats;
 use Crm\Models\Subscription;
 
 final class DashboardController extends Controller
@@ -19,22 +20,41 @@ final class DashboardController extends Controller
     {
         $me = $this->user();
         $settings = Settings::all();
+        $hour = (int)date('G');
+
         $this->view('dashboard/index', [
-            'title' => 'Dashboard',
+            'title' => ($hour < 12 ? 'Good morning' : ($hour < 18 ? 'Good afternoon' : 'Good evening')) . ', ' . explode(' ', $me['name'])[0],
+            'pretitle' => date('l, F j'),
+
+            // KPIs
+            'thisMonth' => Stats::month(0),
+            'lastMonth' => Stats::month(-1),
+            'monthly' => Stats::monthly(12),
+            'invoiceSummary' => Invoice::summary(),
+            'mrr' => Subscription::mrr(),
+            'activePlans' => Stats::activePlans(),
+
+            // Charts
+            'salesByRep' => Stats::salesByRep(),
+            'packagesSold' => Stats::packagesSold(),
+            'aging' => Stats::aging(),
             'clientCounts' => Client::counts(),
-            'newClients30' => (int)Database::value('SELECT COUNT(*) FROM clients WHERE created_at >= NOW() - INTERVAL 30 DAY'),
-            'briefCounts' => Brief::counts(),
+            'conversion' => Stats::conversion(90),
+            'newClients' => Stats::newClientsThisMonth(),
+
+            // Work lists
             'tasks' => Activity::openTasks((int)$me['id'], 8),
             'openTaskCount' => Activity::openTaskCount((int)$me['id']),
             'overdue' => Activity::overdueCount((int)$me['id']),
-            'recentClients' => Client::search([], 1)['rows'],
+            'recurringDue' => Subscription::dueWithin(14),
+            'contractsPending' => array_merge(Contract::search('client_signed'), Contract::search('sent')),
+            'briefCounts' => Brief::counts(),
+            'recentClients' => array_slice(Client::search([], 1)['rows'], 0, 5),
+
+            // Setup checklist (admins)
             'userCount' => (int)Database::value('SELECT COUNT(*) FROM users WHERE is_active = 1'),
             'businessConfigured' => $settings['business_address1'] !== '' && $settings['business_phone'] !== '',
             'catalogPriced' => !(int)Database::value('SELECT COUNT(*) FROM packages WHERE is_active = 1 AND price <= 0'),
-            'invoiceSummary' => Invoice::summary(),
-            'recurringDue' => Subscription::dueWithin(14),
-            'mrr' => Subscription::mrr(),
-            'contractsPending' => array_merge(Contract::search('client_signed'), Contract::search('sent')),
         ]);
     }
 }

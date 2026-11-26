@@ -50,6 +50,11 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
   `admin/app` code without a CRM session and is excluded from the i18n translation.
 - Deploying new code: while migrations are pending, every CRM page shows "Database update required" (admins get the
   Apply button) instead of failing on missing tables.
+- Dashboard KPIs come from `Models\Stats` ("sales" = issued non-void invoices by issue date; "collected" = payments
+  by payment date). Charts are server-rendered inline SVG/HTML partials (`Views/partials/viz_*.php`) — no chart
+  library; hover tooltips via `data-tip-title` + `data-tip` JSON and `assets/app/viz.js`.
+  Chart colors are the CSS variables in `app.css` (`--viz-1..3`, `--seq-1..4`), validated (CVD + contrast) for
+  Tabler's light #ffffff and dark #1f2937 surfaces — reuse them in order, never invent new series colors.
 - Website brief questions live only in `includes/brief-schema.php`. Profiles (`ninubo_brief_profiles()`: landing,
   business, ecommerce) filter steps/fields with `'only' => [...]` / `'except' => [...]`; the brief stores the profile at
   creation. Always call `ninubo_brief_schema($lang, $brief['brief_profile'])`.

@@ -117,6 +117,47 @@ function normalize_phones(array &$data, array $fields, array &$errors): void
     }
 }
 
+/** Compact money for chart axes and tiles: $950, $1.4k, $12k, $1.2M. */
+function money_short(float|int|string|null $amount): string
+{
+    $n = (float)$amount;
+    $abs = abs($n);
+    if ($abs >= 1_000_000) {
+        return '$' . rtrim(rtrim(number_format($n / 1_000_000, 1), '0'), '.') . 'M';
+    }
+    if ($abs >= 1000) {
+        return '$' . rtrim(rtrim(number_format($n / 1000, $abs >= 10000 ? 0 : 1), '0'), '.') . 'k';
+    }
+    return '$' . number_format($n, 0);
+}
+
+/** A "nice" axis maximum (1, 2, 2.5, 5 × 10^n) at or above $value, and its tick step for $ticks gridlines. */
+function nice_scale(float $value, int $ticks = 4): array
+{
+    if ($value <= 0) {
+        return ['max' => 1000.0, 'step' => 250.0];
+    }
+    $raw = $value / $ticks;
+    $pow = 10 ** floor(log10($raw));
+    foreach ([1, 2, 2.5, 5, 10] as $m) {
+        if ($m * $pow >= $raw) {
+            $step = $m * $pow;
+            break;
+        }
+    }
+    return ['max' => $step * $ticks, 'step' => $step];
+}
+
+/** Percent change label between two values ("+12%", "−5%"), or null when there's no base. */
+function pct_change(float $now, float $before): ?string
+{
+    if ($before <= 0) {
+        return null;
+    }
+    $p = ($now - $before) / $before * 100;
+    return ($p >= 0 ? '+' : '−') . number_format(abs($p), 0) . '%';
+}
+
 /** "Sergio Ureña" -> "SU". */
 function initials(string $name): string
 {

@@ -66,7 +66,12 @@
     pause, ownership/portfolio, 30-day warranty, liability, e-signatures). Online signing at `/sign.php?token=…` with
     ESIGN/UETA consent + drawn signature + audit trail; admin countersign; pen-signed upload; PDF with certificate page.
     **Recommend a Texas attorney review the template before first real use.**
-  - Next phase: 5) dashboard KPIs.
+  - Phase 5 (done): dashboard with KPI tiles (sales and collected this month with trend sparklines and change vs
+    last month, outstanding/overdue, monthly recurring), "Invoiced vs collected" 12-month chart with tooltips and a
+    table view, client pipeline + 90-day lead conversion, receivables aging, sales by salesperson, website packages
+    sold, follow-ups, recurring invoices due, contracts in progress, briefs and recent clients. Light and dark mode.
+  - All 5 planned phases are complete. Pending before production: attorney review of the contract template,
+    complete Business settings, move secrets out of `includes/config.php` before pushing to the public GitHub repo.
 
 ## Important follow-ups
 
