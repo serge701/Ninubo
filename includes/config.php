@@ -3,20 +3,33 @@ require_once __DIR__ . '/i18n.php';
 
 $ninuboLanguage = $_GET['lang'] ?? 'es';
 define('NINUBO_LANG', $ninuboLanguage === 'en' ? 'en' : 'es');
-// En XAMPP el sitio se sirve desde http://localhost/ninubo.
-// Cambiar a '' cuando el sitio esté en la raíz de ninubo.com.
-define('NINUBO_BASE', '/ninubo');
 
-// Set this in Apache or the hosting control panel to enable Google Analytics.
-// Example: G-XXXXXXXXXX. Leave blank in local development and until consent is configured.
-define('NINUBO_GA_MEASUREMENT_ID', getenv('NINUBO_GA_MEASUREMENT_ID') ?: '');
+/*
+ * Configuración por servidor (secretos, base de datos, ruta base): includes/config.local.php.
+ * Ese archivo NO está en Git — en cada servidor se crea a partir de includes/config.local.example.php.
+ * Cualquier valor también puede venir de una variable de entorno con el mismo nombre.
+ */
+if (is_file(__DIR__ . '/config.local.php')) {
+    require_once __DIR__ . '/config.local.php';
+}
+foreach ([
+    'NINUBO_BASE' => '',                   // '' = raíz del dominio; '/ninubo' en XAMPP
+    'NINUBO_GA_MEASUREMENT_ID' => '',      // G-XXXXXXXXXX para Google Analytics (opcional)
+    'NINUBO_SECRET' => '',                 // firma los tokens anti-spam del formulario de contacto
+    'NINUBO_ADMIN_PASSWORD_HASH' => '',    // solo para /admin/setup (crear el primer administrador)
+] as $ninuboKey => $ninuboDefault) {
+    if (!defined($ninuboKey)) {
+        define($ninuboKey, getenv($ninuboKey) !== false ? (string)getenv($ninuboKey) : $ninuboDefault);
+    }
+}
+unset($ninuboKey, $ninuboDefault);
 
-// Clave secreta para firmar tokens anti-spam — cambia este valor en producción
-define('NINUBO_SECRET', 'REMOVED-SEE-CONFIG-LOCAL');
-
-// Contraseña del panel admin (brief de clientes). Hash de "[removed]" —
-// cámbiala antes de producción generando un nuevo hash con password_hash().
-define('NINUBO_ADMIN_PASSWORD_HASH', getenv('NINUBO_ADMIN_PASSWORD_HASH') ?: 'REMOVED-SEE-CONFIG-LOCAL');
+// Sin secreto el sitio no puede firmar formularios: mejor avisar claro que fallar en silencio.
+if (NINUBO_SECRET === '' && PHP_SAPI !== 'cli') {
+    http_response_code(503);
+    error_log('[NINUBO] Missing configuration: create includes/config.local.php from includes/config.local.example.php');
+    exit('Site configuration is missing. Please contact the administrator.');
+}
 
 function ninubo_url(string $path = '', ?string $language = null): string {
     $url = NINUBO_BASE . ($path ? '/' . ltrim($path, '/') : '');

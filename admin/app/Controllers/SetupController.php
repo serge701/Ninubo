@@ -32,6 +32,9 @@ final class SetupController extends Controller
         $password = (string)($_POST['password'] ?? '');
         $confirm = (string)($_POST['password_confirm'] ?? '');
 
+        if (NINUBO_ADMIN_PASSWORD_HASH === '') {
+            $this->back('/setup', ['setup_key' => 'Setup is not configured on this server: set NINUBO_ADMIN_PASSWORD_HASH in includes/config.local.php.'], $data);
+        }
         if (!password_verify($setupKey, NINUBO_ADMIN_PASSWORD_HASH)) {
             sleep(2);
             $this->back('/setup', ['setup_key' => 'That is not the current admin-panel password.'], $data);

@@ -1,9 +1,17 @@
 <?php
 /**
- * Conexión PDO a MySQL, usada por el módulo de briefs de cliente.
- * En hosting real, define estas variables de entorno en el panel de control;
- * en XAMPP local caen en los valores por defecto (root sin contraseña).
+ * Conexión PDO a MySQL (briefs de clientes y CRM).
+ * Credenciales: constantes NINUBO_DB_* en includes/config.local.php (no está en Git), o variables de entorno
+ * con el mismo nombre; si no hay ninguna, los valores por defecto de XAMPP (root sin contraseña).
  */
+
+function ninubo_db_setting(string $name, string $default): string {
+    if (defined($name)) {
+        return (string)constant($name);
+    }
+    $env = getenv($name);
+    return $env !== false && $env !== '' ? $env : $default;
+}
 
 function ninubo_db(): PDO {
     static $pdo = null;
@@ -11,10 +19,10 @@ function ninubo_db(): PDO {
         return $pdo;
     }
 
-    $host = getenv('NINUBO_DB_HOST') ?: 'localhost';
-    $name = getenv('NINUBO_DB_NAME') ?: 'ninubo';
-    $user = getenv('NINUBO_DB_USER') ?: 'root';
-    $pass = getenv('NINUBO_DB_PASS') ?: '';
+    $host = ninubo_db_setting('NINUBO_DB_HOST', 'localhost');
+    $name = ninubo_db_setting('NINUBO_DB_NAME', 'ninubo');
+    $user = ninubo_db_setting('NINUBO_DB_USER', 'root');
+    $pass = ninubo_db_setting('NINUBO_DB_PASS', '');
 
     $dsn = "mysql:host={$host};dbname={$name};charset=utf8mb4";
     $pdo = new PDO($dsn, $user, $pass, [

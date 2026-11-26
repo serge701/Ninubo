@@ -59,7 +59,16 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
   business, ecommerce) filter steps/fields with `'only' => [...]` / `'except' => [...]`; the brief stores the profile at
   creation. Always call `ninubo_brief_schema($lang, $brief['brief_profile'])`.
 
+## Configuration & deployment
+
+- Per-server values live in `includes/config.local.php` (git-ignored; template `includes/config.local.example.php`):
+  `NINUBO_BASE` ('/ninubo' in XAMPP, '' in production), `NINUBO_SECRET`, `NINUBO_ADMIN_PASSWORD_HASH`,
+  `NINUBO_DB_*`, optional `NINUBO_GA_MEASUREMENT_ID`. Env vars with the same names also work.
+  Never hard-code any of these in tracked files again.
+- Production deploys with `git pull` on the hosting (see `DEPLOY.md`); Dompdf is committed in `admin/vendor`.
+
 ## Safety
 
-- Public GitHub repo (`origin`). Don't commit secrets, `admin/storage/*`, DB dumps (`C:\xampp\backups\`).
+- Public GitHub repo (`origin`). Don't commit secrets, partner/production costs, `admin/storage/*`, DB dumps
+  (`C:\xampp\backups\`). History was scrubbed of the old secret/hash/partner prices on 2026-11-25.
 - Back up the `ninubo` DB (`mysqldump`) before destructive DB steps.
