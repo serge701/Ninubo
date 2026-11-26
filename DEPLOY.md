@@ -2,13 +2,20 @@
 
 - Repositorio: `https://github.com/serge701/Ninubo` (rama `main`, **público**). SSH: `git@github.com:serge701/Ninubo.git`
   (la llave SSH del servidor ya está registrada en la cuenta de GitHub).
-- Hosting: HostGator compartido, cPanel, SSH con *jailshell*, servidor web **LiteSpeed**, PHP 8.2 (web y CLI), **MySQL 5.7**.
-- Carpeta del sitio (document root de ninubo.com): `~/ninubo.com` *(confirmar con el paso 0)*. Respaldos: `~/respaldos_ninubo/`.
+- Hosting: HostGator compartido, cPanel, SSH con *jailshell*, servidor web **LiteSpeed**, PHP 8.3 (CLI), **MySQL 5.7**.
+- Carpeta del sitio (document root de ninubo.com): `/home2/lizzmald/ninubo.com` (`~/ninubo.com`). Respaldos: `~/respaldos_ninubo/`.
+- Base de datos del sitio + CRM: **`lizzmald_ninuboweb`** (usuario `lizzmald_store`). ⚠️ No usar `lizzmald_ninubo`:
+  es de otra aplicación (asistencia) y tiene su propia tabla `users`.
 - El código no tiene secretos: cada servidor tiene su `includes/config.local.php`, que no está en Git.
+- **Desplegado por primera vez el 2026-11-25** (commit `337c18f`). Para actualizar, ir directo a
+  [Actualizaciones posteriores](#actualizaciones-posteriores).
 
 ## Reglas para pegar comandos en el jailshell
 
+- **Al conectarte**, escribe a mano (no pegues) `bind 'set enable-bracketed-paste off'`: la terminal envuelve lo
+  pegado con `^[[200~ … ~` y el jailshell no lo entiende.
 - Pegar cada bloque completo; van envueltos en `( set -e … )` para que un error no cierre la sesión SSH.
+- `curl` desde el propio servidor puede recibir **409** del filtro anti-bots de HostGator: comprobar esa página en el navegador.
 - **No usar `!`** en ningún comando ni texto entre comillas dobles (bash lo toma como *history expansion*).
 - `mysqldump` puede mostrar "Access denied; you need the PROCESS privilege … tablespaces": es inofensivo; el
   respaldo es válido si su última línea dice `-- Dump completed`.
@@ -105,19 +112,29 @@ firmante), **Catalog** (precios y costo de producción de cada paquete — el co
 
 ## Actualizaciones posteriores
 
+Un solo bloque: respalda la base y los archivos subidos, trae el código y aplica migraciones pendientes.
+Lee las credenciales de `includes/config.local.php`, así que no pide ni muestra contraseñas.
+
 ```bash
 ( set -e
 cd ~/ninubo.com
 STAMP=$(date +%F_%H%M)
-mysqldump -u USUARIO_DB -p NOMBRE_DB > ~/respaldos_ninubo/db_${STAMP}.sql || true
+H=$(php -r 'require "includes/config.local.php"; echo NINUBO_DB_HOST;')
+U=$(php -r 'require "includes/config.local.php"; echo NINUBO_DB_USER;')
+N=$(php -r 'require "includes/config.local.php"; echo NINUBO_DB_NAME;')
+export MYSQL_PWD=$(php -r 'require "includes/config.local.php"; echo NINUBO_DB_PASS;')
+mysqldump -h "$H" -u "$U" "$N" > ~/respaldos_ninubo/db_${STAMP}.sql || true
 tail -1 ~/respaldos_ninubo/db_${STAMP}.sql
-git pull --ff-only origin main
+tar -czf ~/respaldos_ninubo/storage_${STAMP}.tar.gz admin/storage
+git pull -q --ff-only origin main
 git log --oneline -1
+php admin/scripts/migrate.php
+git status --short --untracked-files=all
 )
 ```
 
-Si la actualización trae cambios de base de datos, al abrir `https://ninubo.com/admin/` aparece
-**"Database update required"** → **Apply update now** (o por terminal: `php admin/scripts/migrate.php`).
+Debe terminar con `-- Dump completed`, el commit nuevo y `Up to date.` (o la lista de migraciones aplicadas).
+También se pueden aplicar desde el CRM: al abrir `https://ninubo.com/admin/` aparece **"Database update required"**.
 
 ## Notas
 

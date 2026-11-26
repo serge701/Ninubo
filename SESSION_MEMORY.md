@@ -70,7 +70,8 @@
     last month, outstanding/overdue, monthly recurring), "Invoiced vs collected" 12-month chart with tooltips and a
     table view, client pipeline + 90-day lead conversion, receivables aging, sales by salesperson, website packages
     sold, follow-ups, recurring invoices due, contracts in progress, briefs and recent clients. Light and dark mode.
-  - All 5 planned phases are complete. Pending before production: attorney review of the contract template,
+  - DEPLOYED to production 2026-11-25 (HostGator, ~/ninubo.com, DB lizzmald_ninuboweb, admin serge701) — see DEPLOY.md.
+  - All 5 planned phases are complete. Remaining: attorney review of the contract template,
     complete Business settings, move secrets out of `includes/config.php` before pushing to the public GitHub repo.
 
 ## Important follow-ups
