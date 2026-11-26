@@ -36,12 +36,75 @@
     }
   });
 
-  // Forms that need confirmation: <form data-confirm="Are you sure?">.
+  // Forms that need confirmation, shown in a Tabler modal (never the browser's confirm box):
+  //   <form data-confirm="Message" data-confirm-title="Title" data-confirm-button="Delete" data-confirm-variant="danger">
+  // Variant: "danger" (default for delete / void / cancel / reset wording) or "primary".
+  var confirmModal = null;
+  var pendingForm = null;
+
+  function buildConfirmModal() {
+    var el = document.createElement('div');
+    el.className = 'modal modal-blur fade';
+    el.id = 'crm-confirm';
+    el.tabIndex = -1;
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML =
+      '<div class="modal-dialog modal-sm modal-dialog-centered" role="document"><div class="modal-content">' +
+      '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+      '<div class="modal-status"></div>' +
+      '<div class="modal-body text-center py-4">' +
+      '<i class="ti crm-confirm-icon mb-2"></i>' +
+      '<h3 class="crm-confirm-title"></h3>' +
+      '<div class="text-secondary crm-confirm-message"></div>' +
+      '</div>' +
+      '<div class="modal-footer"><div class="w-100"><div class="row">' +
+      '<div class="col"><button type="button" class="btn w-100" data-bs-dismiss="modal">Cancel</button></div>' +
+      '<div class="col"><button type="button" class="btn w-100 crm-confirm-ok"></button></div>' +
+      '</div></div></div>' +
+      '</div></div>';
+    document.body.appendChild(el);
+    el.querySelector('.crm-confirm-ok').addEventListener('click', function () {
+      var form = pendingForm;
+      pendingForm = null;
+      confirmModal.hide();
+      if (form) {
+        form.dataset.confirmed = '1';
+        if (form.requestSubmit) form.requestSubmit(); else form.submit();
+      }
+    });
+    el.addEventListener('shown.bs.modal', function () { el.querySelector('.crm-confirm-ok').focus(); });
+    return new window.tabler.Modal(el);
+  }
+
   document.addEventListener('submit', function (e) {
     var form = e.target.closest('form[data-confirm]');
-    if (form && !window.confirm(form.getAttribute('data-confirm'))) {
-      e.preventDefault();
+    if (!form) return;
+    if (form.dataset.confirmed === '1') { delete form.dataset.confirmed; return; } // already confirmed
+    e.preventDefault();
+
+    // Fallback if Tabler's JS isn't available for some reason.
+    if (!window.tabler || !window.tabler.Modal) {
+      if (window.confirm(form.getAttribute('data-confirm'))) { form.dataset.confirmed = '1'; form.submit(); }
+      return;
     }
+    confirmModal = confirmModal || buildConfirmModal();
+    var el = document.getElementById('crm-confirm');
+    var message = form.getAttribute('data-confirm');
+    var button = form.getAttribute('data-confirm-button') || 'Confirm';
+    var variant = form.getAttribute('data-confirm-variant') ||
+      (/delete|void|cancel|reset|remove/i.test(button + ' ' + message) ? 'danger' : 'primary');
+    var icon = variant === 'danger' ? 'ti-alert-triangle text-danger' : 'ti-circle-check text-primary';
+
+    el.querySelector('.modal-status').className = 'modal-status bg-' + variant;
+    el.querySelector('.crm-confirm-icon').className = 'ti ' + icon + ' crm-confirm-icon mb-2';
+    el.querySelector('.crm-confirm-title').textContent = form.getAttribute('data-confirm-title') || 'Are you sure?';
+    el.querySelector('.crm-confirm-message').textContent = message;
+    var ok = el.querySelector('.crm-confirm-ok');
+    ok.className = 'btn btn-' + variant + ' w-100 crm-confirm-ok';
+    ok.textContent = button;
+
+    pendingForm = form;
+    confirmModal.show();
   });
 
   // Show / hide password: <a data-toggle-password="#inputId">.

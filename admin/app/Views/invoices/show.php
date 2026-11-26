@@ -13,7 +13,7 @@ $canPay = in_array($inv['status'], ['sent', 'partial'], true);
 <a href="<?= url('/clients/' . (int)$inv['client_id']) ?>" class="btn"><i class="ti ti-address-book me-1"></i>Client</a>
 <?php if ($isDraft): ?>
   <a href="<?= url('/invoices/' . $id . '/edit') ?>" class="btn"><i class="ti ti-pencil me-1"></i>Edit</a>
-  <form method="post" action="<?= url('/invoices/' . $id . '/issue') ?>" class="m-0" data-confirm="Issue this invoice? It gets its number and can no longer be edited.">
+  <form method="post" action="<?= url('/invoices/' . $id . '/issue') ?>" class="m-0" data-confirm="It gets its invoice number and can no longer be edited. Then you can download the PDF and record payments." data-confirm-title="Issue this invoice?" data-confirm-button="Issue invoice" data-confirm-variant="primary">
     <?= csrf_field() ?><button class="btn btn-primary"><i class="ti ti-send me-1"></i>Issue invoice</button>
   </form>
 <?php else: ?>
@@ -102,7 +102,7 @@ $canPay = in_array($inv['status'], ['sent', 'partial'], true);
               <?php if ($p['notes'] !== ''): ?><div class="small"><?= e($p['notes']) ?></div><?php endif; ?>
             </div>
             <?php if (is_admin() && $inv['status'] !== 'void'): ?>
-            <form method="post" action="<?= url('/payments/' . (int)$p['id'] . '/delete') ?>" class="m-0" data-confirm="Delete this payment of <?= e(money($p['amount'])) ?>? The balance will be recalculated.">
+            <form method="post" action="<?= url('/payments/' . (int)$p['id'] . '/delete') ?>" class="m-0" data-confirm="The payment of <?= e(money($p['amount'])) ?> is removed and the balance is recalculated." data-confirm-title="Delete this payment?" data-confirm-button="Delete payment">
               <?= csrf_field() ?><button class="btn btn-sm btn-ghost-danger px-2" title="Delete payment"><i class="ti ti-trash"></i></button>
             </form>
             <?php endif; ?>
@@ -122,13 +122,13 @@ $canPay = in_array($inv['status'], ['sent', 'partial'], true);
     <?php endif; ?>
 
     <?php if ($isDraft): ?>
-    <form method="post" action="<?= url('/invoices/' . $id . '/delete') ?>" data-confirm="Delete this draft?" class="text-end">
+    <form method="post" action="<?= url('/invoices/' . $id . '/delete') ?>" data-confirm="The draft and its lines are removed." data-confirm-title="Delete this draft?" data-confirm-button="Delete draft" class="text-end">
       <?= csrf_field() ?><button class="btn btn-link link-danger btn-sm p-0"><i class="ti ti-trash me-1"></i>Delete draft</button>
     </form>
     <?php elseif (is_admin() && $inv['status'] !== 'void'): ?>
     <div class="card border-danger-subtle">
       <div class="card-body">
-        <form method="post" action="<?= url('/invoices/' . $id . '/void') ?>" data-confirm="Void invoice <?= e($inv['number']) ?>? This cannot be undone.">
+        <form method="post" action="<?= url('/invoices/' . $id . '/void') ?>" data-confirm="Invoice <?= e($inv['number']) ?> is voided and its number is never reused. Recurring services it started are cancelled. This cannot be undone." data-confirm-title="Void this invoice?" data-confirm-button="Void invoice">
           <?= csrf_field() ?>
           <label class="form-label" for="void_reason">Void this invoice</label>
           <input type="text" class="form-control form-control-sm mb-2" id="void_reason" name="void_reason" placeholder="Reason (e.g. wrong package, replaced by INV-…)" required>

@@ -90,3 +90,6 @@
 .crm-lines td:not(:first-child) { white-space: nowrap; }
 .crm-lines textarea[data-f="details"] { resize: none; overflow: hidden; font-size: .8rem; }
 .crm-totals { position: sticky; top: 1rem; }
+
+/* Confirmation modal (app.js) */
+#crm-confirm .crm-confirm-icon { font-size: 2.75rem; display: inline-block; }

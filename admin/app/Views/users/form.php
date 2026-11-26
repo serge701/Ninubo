@@ -94,7 +94,7 @@ $isSelf = !$isNew && (int)$u['id'] === (int)auth_user()['id'];
       <div class="card-body">
         <h3 class="card-title">Password</h3>
         <p class="text-secondary">Generates a new temporary password. The user must change it at their next sign-in.</p>
-        <form method="post" action="<?= url('/users/' . (int)$u['id'] . '/reset-password') ?>" data-confirm="Reset the password for <?= e($u['name']) ?>? Their current password will stop working.">
+        <form method="post" action="<?= url('/users/' . (int)$u['id'] . '/reset-password') ?>" data-confirm="A temporary password is generated for <?= e($u['name']) ?>. Their current password stops working." data-confirm-title="Reset password?" data-confirm-button="Reset password">
           <?= csrf_field() ?>
           <button type="submit" class="btn btn-outline-warning w-100"><i class="ti ti-key me-1"></i>Reset password</button>
         </form>

@@ -57,7 +57,7 @@ foreach (ninubo_brief_profiles() as $key => $label) {
     <?php if (!$isNew): ?>
     <div class="card mt-3">
       <div class="card-body">
-        <form method="post" action="<?= url('/catalog/' . (int)$p['id'] . '/delete') ?>" data-confirm="Delete &quot;<?= e($p['name']) ?>&quot; from the catalog?">
+        <form method="post" action="<?= url('/catalog/' . (int)$p['id'] . '/delete') ?>" data-confirm="&quot;<?= e($p['name']) ?>&quot; will be removed from the catalog." data-confirm-title="Delete this item?" data-confirm-button="Delete">
           <?= csrf_field() ?>
           <button type="submit" class="btn btn-outline-danger w-100"><i class="ti ti-trash me-1"></i>Delete</button>
         </form>

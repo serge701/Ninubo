@@ -91,7 +91,7 @@ $sources = array_combine(Client::SOURCES, Client::SOURCES);
       <div class="fw-bold">Delete this client</div>
       <div class="text-secondary small">Removes the client and their activity timeline. Website briefs are kept. This cannot be undone.</div>
     </div>
-    <form method="post" action="<?= url('/clients/' . (int)$c['id'] . '/delete') ?>" data-confirm="Delete this client and their activity? This cannot be undone.">
+    <form method="post" action="<?= url('/clients/' . (int)$c['id'] . '/delete') ?>" data-confirm="The client and their activity timeline are removed. Website briefs are kept. This cannot be undone." data-confirm-title="Delete this client?" data-confirm-button="Delete client">
       <?= csrf_field() ?>
       <button type="submit" class="btn btn-outline-danger"><i class="ti ti-trash me-1"></i>Delete client</button>
     </form>

@@ -178,7 +178,7 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
                     <button class="btn btn-sm btn-primary w-100">Save</button>
                   </form>
                   <hr class="my-2">
-                  <form method="post" action="<?= url('/subscriptions/' . (int)$sub['id'] . '/cancel') ?>" data-confirm="Cancel &quot;<?= e($sub['description']) ?>&quot;? No more invoices will be suggested for it."><?= csrf_field() ?>
+                  <form method="post" action="<?= url('/subscriptions/' . (int)$sub['id'] . '/cancel') ?>" data-confirm="No more invoices will be suggested for &quot;<?= e($sub['description']) ?>&quot;." data-confirm-title="Cancel this service?" data-confirm-button="Cancel service"><?= csrf_field() ?>
                     <button class="btn btn-sm btn-ghost-danger w-100"><i class="ti ti-x me-1"></i>Cancel service</button>
                   </form>
                 </div>
@@ -257,7 +257,7 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
                 </form>
                 <?php endif; ?>
                 <?php if ($canDelete): ?>
-                <form method="post" action="<?= url('/activities/' . (int)$a['id'] . '/delete') ?>" class="m-0" data-confirm="Delete this activity?">
+                <form method="post" action="<?= url('/activities/' . (int)$a['id'] . '/delete') ?>" class="m-0" data-confirm="This entry will be removed from the timeline." data-confirm-title="Delete this activity?" data-confirm-button="Delete">
                   <?= csrf_field() ?>
                   <button class="btn btn-sm btn-ghost-danger px-2"><i class="ti ti-trash"></i></button>
                 </form>

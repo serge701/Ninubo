@@ -58,7 +58,7 @@ $newLink = Session::peekFlash('new_brief_link');
       <div class="fw-bold">Delete this brief</div>
       <div class="text-secondary small">Removes the link and every answer — the client can no longer open it. This cannot be undone.</div>
     </div>
-    <form method="post" action="<?= url('/briefs/' . (int)$brief['id'] . '/delete') ?>" data-confirm="Delete this brief and all its answers? This cannot be undone.">
+    <form method="post" action="<?= url('/briefs/' . (int)$brief['id'] . '/delete') ?>" data-confirm="The link stops working and every answer is removed. This cannot be undone." data-confirm-title="Delete this brief?" data-confirm-button="Delete brief">
       <?= csrf_field() ?>
       <button type="submit" class="btn btn-outline-danger"><i class="ti ti-trash me-1"></i>Delete</button>
     </form>

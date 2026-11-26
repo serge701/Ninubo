@@ -117,7 +117,7 @@ $input = function (string $key, string $label, array $opt = []) use ($v): string
 </form>
 
 <?php if ($s['business_logo'] !== ''): ?>
-<form method="post" action="<?= url('/settings/logo/delete') ?>" data-confirm="Remove the logo?" class="text-end">
+<form method="post" action="<?= url('/settings/logo/delete') ?>" data-confirm="Documents will show the business name instead." data-confirm-title="Remove the logo?" data-confirm-button="Remove logo" class="text-end">
   <?= csrf_field() ?>
   <button type="submit" class="btn btn-link link-danger btn-sm p-0">Remove current logo</button>
 </form>
