@@ -107,6 +107,10 @@ $input = function (string $key, string $label, array $opt = []) use ($v): string
         <?= $input('contract_prefix', 'Contract number prefix', ['col' => 'col-md-4', 'placeholder' => 'AGR-']) ?>
         <?= $input('contract_next_number', 'Next contract number', ['col' => 'col-md-4', 'type' => 'number']) ?>
         <?= $input('contract_governing_county', 'Venue county (Texas)', ['col' => 'col-md-4', 'hint' => 'Courts where disputes are heard, e.g. Hidalgo or Cameron.']) ?>
+        <?= $input('contract_plan_cancel_days', 'Care plan cancellation notice', ['col' => 'col-md-3', 'type' => 'number', 'suffix' => 'days', 'hint' => 'Written notice the client gives to cancel a monthly plan.']) ?>
+        <?= $input('contract_late_suspend_days', 'Suspend services when late', ['col' => 'col-md-3', 'type' => 'number', 'suffix' => 'days', 'hint' => 'Days past due before work or hosting may be suspended.']) ?>
+        <?= $input('contract_materials_pause_days', 'Pause project without materials', ['col' => 'col-md-3', 'type' => 'number', 'suffix' => 'days', 'hint' => 'Days without the client\'s materials before the project is paused.']) ?>
+        <?= $input('contract_warranty_days', 'Warranty after launch', ['col' => 'col-md-3', 'type' => 'number', 'suffix' => 'days', 'hint' => 'Fixes for defects in the original development.']) ?>
       </div>
     </div>
   </div>

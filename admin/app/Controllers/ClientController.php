@@ -7,6 +7,7 @@ use Crm\Core\Controller;
 use Crm\Models\Activity;
 use Crm\Models\Brief;
 use Crm\Models\Client;
+use Crm\Models\Contract;
 use Crm\Models\Invoice;
 use Crm\Models\Package;
 use Crm\Models\Subscription;
@@ -75,6 +76,7 @@ final class ClientController extends Controller
             'briefPackages' => Package::withBrief(),
             'invoices' => Invoice::forClient((int)$client['id']),
             'subscriptions' => Subscription::forClient((int)$client['id']),
+            'contracts' => Contract::forClient((int)$client['id']),
         ]);
     }
 
@@ -116,8 +118,8 @@ final class ClientController extends Controller
     public function destroy(string $id): void
     {
         $client = Client::find((int)$id) ?? $this->notFound();
-        if (Invoice::countForClient((int)$client['id']) > 0) {
-            \Crm\Core\Session::flash('danger', 'This client has invoices, so it cannot be deleted (accounting records must be kept). Mark the client as Inactive instead.');
+        if (Invoice::countForClient((int)$client['id']) > 0 || Contract::countForClient((int)$client['id']) > 0) {
+            \Crm\Core\Session::flash('danger', 'This client has invoices or contracts, so it cannot be deleted (those records must be kept). Mark the client as Inactive instead.');
             $this->redirect('/clients/' . $client['id'] . '/edit');
         }
         Client::delete((int)$client['id']);

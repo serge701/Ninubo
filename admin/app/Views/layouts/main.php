@@ -18,6 +18,7 @@ $nav = [
     ['/', 'layout-dashboard', 'Dashboard', false],
     ['/clients', 'address-book', 'Clients', false],
     ['/invoices', 'file-invoice', 'Invoices', false],
+    ['/contracts', 'file-certificate', 'Contracts', false],
     ['/briefs', 'forms', 'Website briefs', false],
     ['/catalog', 'package', 'Catalog', false],
 ];

@@ -67,7 +67,7 @@ function ninubo_should_translate_page(): bool {
     $root = str_replace('\\', '/', dirname(__DIR__));
     $relative = ltrim(str_starts_with($script, $root) ? substr($script, strlen($root)) : basename($script), '/');
 
-    if ($relative === 'brief.php') {
+    if ($relative === 'brief.php' || $relative === 'sign.php') {
         return false;
     }
     foreach (['admin/', 'api/'] as $prefix) {

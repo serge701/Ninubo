@@ -39,6 +39,17 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
   later. Voiding undoes this (cancels services it started, moves billed periods back).
 - PDF: Dompdf in `admin/vendor/` (installed with Composer, committed so hosting needs no Composer); `Core\Pdf`
   disables remote fetches and PHP; logo is embedded as a data: URI. Business identity on documents comes from Settings.
+- Contracts (`Models\Contract`): created from a client, based on one of its issued invoices. draft (live preview
+  rendered from `Views/contracts/agreement.php`) → finalize (number AGR-####, text frozen in `body_html` + SHA-256
+  `body_hash`, secret `token`) → client signs at the public `/sign.php?token=…` (ESIGN/UETA consent, typed name,
+  drawn signature, IP, user agent; must match `body_hash`) → admin countersigns, or a pen-signed scan is uploaded.
+  Every step goes to `contract_events` (audit trail printed as the PDF's "Certificate of Electronic Signature").
+  Never edit a finalized contract's text — cancel and create a new one. Editing the template only affects new drafts.
+  Day limits (plan cancellation, late suspension, materials pause, warranty) and venue county are Settings.
+- `/sign.php` lives at the site root (not under /admin) so the client's link doesn't expose the CRM; it reuses
+  `admin/app` code without a CRM session and is excluded from the i18n translation.
+- Deploying new code: while migrations are pending, every CRM page shows "Database update required" (admins get the
+  Apply button) instead of failing on missing tables.
 - Website brief questions live only in `includes/brief-schema.php`. Profiles (`ninubo_brief_profiles()`: landing,
   business, ecommerce) filter steps/fields with `'only' => [...]` / `'except' => [...]`; the brief stores the profile at
   creation. Always call `ninubo_brief_schema($lang, $brief['brief_profile'])`.

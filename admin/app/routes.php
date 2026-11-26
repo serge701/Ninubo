@@ -6,6 +6,7 @@ use Crm\Controllers\AuthController;
 use Crm\Controllers\BriefController;
 use Crm\Controllers\CatalogController;
 use Crm\Controllers\ClientController;
+use Crm\Controllers\ContractController;
 use Crm\Controllers\DashboardController;
 use Crm\Controllers\InvoiceController;
 use Crm\Controllers\SubscriptionController;
@@ -60,6 +61,21 @@ $router->post('/invoices/{id}/delete', [InvoiceController::class, 'destroy']);
 $router->post('/subscriptions/{id}/invoice', [SubscriptionController::class, 'invoice']);
 $router->post('/subscriptions/{id}', [SubscriptionController::class, 'update']);
 $router->post('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel']);
+
+// Contracts (created from a client, based on an issued invoice; signed at /sign.php?token=...)
+$router->get('/contracts', [ContractController::class, 'index']);
+$router->get('/clients/{id}/contracts/new', [ContractController::class, 'create']);
+$router->post('/contracts', [ContractController::class, 'store']);
+$router->get('/contracts/{id}', [ContractController::class, 'show']);
+$router->get('/contracts/{id}/edit', [ContractController::class, 'edit']);
+$router->post('/contracts/{id}', [ContractController::class, 'update']);
+$router->post('/contracts/{id}/finalize', [ContractController::class, 'finalize']);
+$router->get('/contracts/{id}/pdf', [ContractController::class, 'pdf']);
+$router->post('/contracts/{id}/countersign', [ContractController::class, 'countersign'], $admin);
+$router->post('/contracts/{id}/upload', [ContractController::class, 'uploadSigned']);
+$router->get('/contracts/{id}/signed-file', [ContractController::class, 'signedFile']);
+$router->post('/contracts/{id}/cancel', [ContractController::class, 'cancel'], $admin);
+$router->post('/contracts/{id}/delete', [ContractController::class, 'destroy']);
 
 // Packages & services catalog (view: everyone, edit: admin)
 $router->get('/catalog', [CatalogController::class, 'index']);

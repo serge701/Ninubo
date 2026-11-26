@@ -41,6 +41,10 @@ final class Settings
         'contract_prefix' => 'AGR-',
         'contract_next_number' => '1001',
         'contract_governing_county' => 'Hidalgo',
+        'contract_plan_cancel_days' => '30',     // written notice to cancel a monthly plan
+        'contract_late_suspend_days' => '15',    // days past due before work/hosting may be suspended
+        'contract_materials_pause_days' => '60', // days without client materials before the project is paused
+        'contract_warranty_days' => '30',        // bug-fix warranty after launch
     ];
 
     private static ?array $cache = null;

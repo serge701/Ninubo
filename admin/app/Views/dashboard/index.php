@@ -123,6 +123,25 @@ $setupDone = $businessConfigured && $catalogPriced && $userCount > 1;
     </div>
     <?php endif; ?>
 
+    <?php if ($contractsPending): ?>
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="card-title">Contracts in progress</h3></div>
+      <div class="list-group list-group-flush">
+        <?php foreach (array_slice($contractsPending, 0, 6) as $k): ?>
+        <a href="<?= url('/contracts/' . (int)$k['id']) ?>" class="list-group-item list-group-item-action">
+          <div class="d-flex justify-content-between align-items-center gap-2">
+            <div>
+              <div class="fw-medium"><?= e($k['number']) ?> · <?= e(Client::displayName($k)) ?></div>
+              <div class="small text-secondary"><?= $k['status'] === 'client_signed' ? 'Signed by the client — ready to countersign' : 'Waiting for the client to sign · sent ' . e(time_ago($k['sent_at'])) ?></div>
+            </div>
+            <?= status_badge($k['status'], \Crm\Models\Contract::STATUS_COLORS, \Crm\Models\Contract::STATUSES) ?>
+          </div>
+        </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+    <?php endif; ?>
+
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Recently updated clients</h3>

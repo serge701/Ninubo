@@ -47,7 +47,8 @@ final class SettingsController extends Controller
         if (($values['website_renewal_package_id'] ?? '') !== '' && !ctype_digit($values['website_renewal_package_id'])) {
             $values['website_renewal_package_id'] = '';
         }
-        foreach (['invoice_due_days', 'invoice_next_number', 'contract_next_number'] as $key) {
+        foreach (['invoice_due_days', 'invoice_next_number', 'contract_next_number', 'contract_plan_cancel_days',
+                  'contract_late_suspend_days', 'contract_materials_pause_days', 'contract_warranty_days'] as $key) {
             if (!ctype_digit($values[$key] ?? '')) {
                 $errors[$key] = 'Enter a whole number.';
             }

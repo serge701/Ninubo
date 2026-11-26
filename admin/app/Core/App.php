@@ -94,6 +94,14 @@ final class App
             }
         }
 
+        // New code deployed but the database not updated yet: pages would fail on missing tables/columns,
+        // so hold everything (except applying the update and signing out) until the migrations run.
+        if (empty($options['public']) && !in_array($uri, ['/system/migrate', '/logout'], true) && ($pending = Migrator::pending())) {
+            http_response_code(503);
+            View::render('errors/migrate', ['title' => 'Database update required', 'pending' => $pending], 'layouts/auth');
+            exit;
+        }
+
         if ($method === 'POST' && !Csrf::verify($_POST['_csrf'] ?? null)) {
             self::abort(403, 'Form expired', 'The form expired or was submitted from another site. Go back, reload the page and try again.');
         }

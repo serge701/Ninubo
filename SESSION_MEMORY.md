@@ -60,7 +60,13 @@
     yearly Domain & Hosting Renewal scheduled automatically (catalog item, **price still $0 — owner must set it**).
     Owner decisions: blog & booking only in Premium; Business delivery 10–15 business days; domain + hosting
     included for the first year, renewed yearly.
-  - Next phases: 4) contracts with English RGV template + e-signature link + PDF, 5) dashboard KPIs.
+  - Phase 4 (done): contracts from the client page based on an issued invoice. Original English "Website Design and
+    Services Agreement" (Texas law, venue county from Settings, 17 sections incl. scope, payments, materials, revisions,
+    domain/hosting renewal $150/yr, care plan with 30-day cancellation, 15-day late suspension, 60-day materials
+    pause, ownership/portfolio, 30-day warranty, liability, e-signatures). Online signing at `/sign.php?token=…` with
+    ESIGN/UETA consent + drawn signature + audit trail; admin countersign; pen-signed upload; PDF with certificate page.
+    **Recommend a Texas attorney review the template before first real use.**
+  - Next phase: 5) dashboard KPIs.
 
 ## Important follow-ups
 

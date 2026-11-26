@@ -9,6 +9,7 @@ use Crm\Core\Settings;
 use Crm\Models\Activity;
 use Crm\Models\Brief;
 use Crm\Models\Client;
+use Crm\Models\Contract;
 use Crm\Models\Invoice;
 use Crm\Models\Subscription;
 
@@ -33,6 +34,7 @@ final class DashboardController extends Controller
             'invoiceSummary' => Invoice::summary(),
             'recurringDue' => Subscription::dueWithin(14),
             'mrr' => Subscription::mrr(),
+            'contractsPending' => array_merge(Contract::search('client_signed'), Contract::search('sent')),
         ]);
     }
 }

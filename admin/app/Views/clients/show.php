@@ -3,6 +3,7 @@ use Crm\Core\View;
 use Crm\Models\Activity;
 use Crm\Models\Brief;
 use Crm\Models\Client;
+use Crm\Models\Contract;
 use Crm\Models\Invoice;
 use Crm\Models\Subscription;
 
@@ -19,7 +20,7 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
   <div class="dropdown-menu dropdown-menu-end">
     <a class="dropdown-item" href="#new-brief" data-bs-toggle="modal"><i class="ti ti-forms dropdown-item-icon"></i>Website brief</a>
     <a class="dropdown-item" href="<?= url('/clients/' . $id . '/invoices/new') ?>"><i class="ti ti-file-invoice dropdown-item-icon"></i>Invoice</a>
-    <span class="dropdown-item disabled"><i class="ti ti-file-certificate dropdown-item-icon"></i>Contract <span class="badge bg-secondary-lt ms-auto">soon</span></span>
+    <a class="dropdown-item" href="<?= url('/clients/' . $id . '/contracts/new') ?>"><i class="ti ti-file-certificate dropdown-item-icon"></i>Contract</a>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item" href="#activity" data-focus-composer="task"><i class="ti ti-calendar-check dropdown-item-icon"></i>Follow-up</a>
     <a class="dropdown-item" href="#activity" data-focus-composer="note"><i class="ti ti-notes dropdown-item-icon"></i>Note</a>
@@ -193,8 +194,27 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><h3 class="card-title"><i class="ti ti-file-certificate me-2"></i>Contracts</h3></div>
-      <div class="card-body text-secondary small">Contracts for this client will appear here (next phase).</div>
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-file-certificate me-2"></i>Contracts</h3>
+        <div class="card-actions"><a href="<?= url('/clients/' . $id . '/contracts/new') ?>" class="btn btn-sm"><i class="ti ti-plus me-1"></i>New contract</a></div>
+      </div>
+      <?php if (!$contracts): ?>
+      <div class="card-body text-secondary">No contracts yet. Issue the invoice first, then create the contract from it.</div>
+      <?php else: ?>
+      <div class="list-group list-group-flush">
+        <?php foreach ($contracts as $kk): ?>
+        <a href="<?= url('/contracts/' . (int)$kk['id']) ?>" class="list-group-item list-group-item-action">
+          <div class="d-flex justify-content-between align-items-center gap-2">
+            <div>
+              <div class="fw-medium"><?= e(Contract::displayNumber($kk)) ?></div>
+              <div class="small text-secondary"><?= $kk['invoice_number'] ? 'Invoice ' . e($kk['invoice_number']) . ' · ' : '' ?>effective <?= e(fmt_date($kk['effective_date'])) ?></div>
+            </div>
+            <?= status_badge($kk['status'], Contract::STATUS_COLORS, Contract::STATUSES) ?>
+          </div>
+        </a>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
     </div>
 
     <div class="card" id="activity">
