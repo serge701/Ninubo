@@ -281,10 +281,11 @@ final class Invoice
     }
 
     /**
-     * Issues a draft: assigns the next invoice number, snapshots the bill-to block and schedules recurring services.
-     * @return string the invoice number
+     * Issues a draft: assigns the next invoice number, snapshots the bill-to block, schedules recurring services
+     * and creates the website brief of each package that has one.
+     * @return array{0: string, 1: string[]} the invoice number and timeline messages for what was set up
      */
-    public static function issue(array $inv, int $userId): string
+    public static function issue(array $inv, int $userId): array
     {
         $pdo = Database::pdo();
         $pdo->beginTransaction();
@@ -311,13 +312,17 @@ final class Invoice
                 'bill_to' => self::billTo($client),
             ]);
 
-            Subscription::scheduleFromInvoice($inv, self::items((int)$inv['id']), $userId);
+            $items = self::items((int)$inv['id']);
+            $log = array_merge(
+                Subscription::scheduleFromInvoice($inv, $items, $userId),
+                Brief::createFromInvoice($inv, $number, $items, $userId)
+            );
             $pdo->commit();
         } catch (\Throwable $e) {
             $pdo->rollBack();
             throw $e;
         }
-        return $number;
+        return [$number, $log];
     }
 
     public static function billTo(array $client): string
@@ -369,21 +374,29 @@ final class Invoice
 
     /**
      * Voids an issued invoice and undoes its effect on recurring services: services it started are cancelled,
-     * and services whose next period it billed go back one period.
-     * @return string[] descriptions of the recurring services that were changed
+     * and services whose next period it billed go back one period. Briefs it created that the client never opened
+     * are deleted. If a care plan it started is cancelled, the yearly domain & hosting renewal comes back.
+     * @return string[] descriptions of what was changed
      */
-    public static function void(int $id, string $reason): array
+    public static function void(int $id, string $reason, int $userId): array
     {
         $changed = [];
         $pdo = Database::pdo();
         $pdo->beginTransaction();
         try {
+            $inv = self::find($id);
             Database::update('invoices', $id, ['status' => 'void', 'voided_at' => date('Y-m-d H:i:s'), 'void_reason' => mb_substr($reason, 0, 255)]);
 
+            $careEnded = false;
             foreach (Database::all("SELECT * FROM client_subscriptions WHERE source_invoice_id = ? AND status = 'active'", [$id]) as $sub) {
                 Subscription::update((int)$sub['id'], ['status' => 'cancelled', 'cancelled_at' => date('Y-m-d H:i:s')]);
                 $changed[] = $sub['description'] . ' (cancelled)';
+                $careEnded = $careEnded || Subscription::isCarePlan($sub);
             }
+            if ($careEnded && ($msg = Subscription::restoreRenewal((int)$inv['client_id'], $userId))) {
+                $changed[] = $msg;
+            }
+            $changed = array_merge($changed, Brief::undoFromInvoice($id));
             $billed = Database::all(
                 "SELECT s.* FROM invoice_items it JOIN client_subscriptions s ON s.id = it.subscription_id
                  WHERE it.invoice_id = ? AND (s.source_invoice_id IS NULL OR s.source_invoice_id <> ?) AND s.status = 'active'",

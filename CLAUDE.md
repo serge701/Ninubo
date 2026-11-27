@@ -3,7 +3,8 @@
 Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_BASE` in `includes/config.php`):
 
 1. **Public site** (Spanish, `?lang=en` via `includes/i18n.php` string replacement) — `*.php` in the root + `includes/`.
-   `brief.php` + `api/brief-guardar.php` are the client-facing website brief (bilingual on its own; excluded from i18n).
+   `brief.php` is the client-facing website brief (bilingual on its own; excluded from i18n; runs on the CRM code —
+   see below). `api/brief-guardar.php` is only a temporary forwarder to it.
 2. **CRM** in `admin/` (English only) — mini-MVC with Tabler 1.4, vertical sidebar. Modeled on `../Shipping`.
 
 ## CRM conventions (`admin/`)
@@ -26,7 +27,7 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
 - **Client-first (owner's rule):** a new sale always starts by creating the client. Briefs, invoices and contracts are
   created *from* a client (client page → "New ▾"); never add a flow that creates them without a client.
 - Every meaningful change on a client writes a timeline entry (`Activity::log`) — status/assignment changes, briefs
-  created/started/submitted (the public `api/brief-guardar.php` logs those too). Keep doing this for invoices/contracts.
+  created/started/submitted/reopened (the public `brief.php` logs those too). Keep doing this for invoices/contracts.
 - Catalog (`packages`): price, billing (one-time/monthly/yearly), `tax_type` (data_processing = taxed on the taxable %
   setting, taxable = 100%, exempt) and `brief_profile`. Items already used can't be deleted, only deactivated.
 - Invoices (`Models\Invoice`): draft (editable, no number) → issue (number from Settings `invoice_next_number`,
@@ -36,7 +37,12 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
   Issued invoices are never edited or deleted; admins void them (number kept). Clients with invoices can't be deleted.
 - Recurring services (`client_subscriptions`): created when an invoice with monthly/yearly lines is issued; a
   website package also schedules the yearly domain & hosting renewal (Settings `website_renewal_package_id`) one year
-  later. Voiding undoes this (cancels services it started, moves billed periods back).
+  later — **except while the client has a care plan** (any `maintenance`-category service), which includes hosting:
+  starting one cancels the renewal, cancelling/voiding the last one reschedules it (`Subscription::restoreRenewal`).
+  Voiding undoes this (cancels services it started, moves billed periods back).
+- Issuing an invoice also creates a website brief per invoiced package with a `brief_profile` (skipped if the client
+  has an open brief for that package); `client_briefs.invoice_id` links them, the link prints on the invoice PDF, and
+  voiding deletes those the client never opened (keeps started/submitted ones). Admins can delete briefs anywhere.
 - PDF: Dompdf in `admin/vendor/` (installed with Composer, committed so hosting needs no Composer); `Core\Pdf`
   disables remote fetches and PHP; logo is embedded as a data: URI. Business identity on documents comes from Settings.
 - Contracts (`Models\Contract`): created from a client, based on one of its issued invoices. draft (live preview
@@ -56,8 +62,17 @@ Two parts in one PHP repo (XAMPP locally at `http://localhost/ninubo`, `NINUBO_B
   Chart colors are the CSS variables in `app.css` (`--viz-1..3`, `--seq-1..4`), validated (CVD + contrast) for
   Tabler's light #ffffff and dark #1f2937 surfaces — reuse them in order, never invent new series colors.
 - Website brief questions live only in `includes/brief-schema.php`. Profiles (`ninubo_brief_profiles()`: landing,
-  business, ecommerce) filter steps/fields with `'only' => [...]` / `'except' => [...]`; the brief stores the profile at
-  creation. Always call `ninubo_brief_schema($lang, $brief['brief_profile'])`.
+  business, premium, ecommerce) filter steps/fields with `'only' => [...]` / `'except' => [...]`, options with
+  `'options_only'`; `'prefill'` fills a field from the client record until the first save. The brief stores the profile
+  at creation. Always call `ninubo_brief_schema($lang, $brief['brief_profile'])`. **Never rename an answer key**
+  (saved briefs use them); removed questions still show in the CRM as "earlier version" answers
+  (`ninubo_brief_legacy_labels()`).
+- Public brief = `/brief.php` (like `/sign.php`: CRM code, no session, token in the link). GET renders
+  `Views/brief/page.php` (Tabler, light by default + dark toggle, ES/EN), POST saves JSON (draft/submit) via
+  `Brief::saveFromClient`. `Core\BriefForm` draws/collects/displays fields for both the public form and the CRM.
+  `admin/assets/app/brief.js` saves only after the client really changed something (opening the link changes nothing).
+  Contact details on it come from Settings (`business_phone`, `business_whatsapp`, `business_email`).
+  Submitted briefs are locked; staff can reopen them from the CRM brief page.
 
 ## Configuration & deployment
 

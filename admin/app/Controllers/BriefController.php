@@ -63,15 +63,32 @@ final class BriefController extends Controller
         ]);
     }
 
+    /** A submitted brief goes back to "in progress" so the client can correct it with the same link. */
+    public function reopen(string $id): void
+    {
+        $brief = Brief::find((int)$id) ?? $this->notFound();
+        if ($brief['status'] === 'completado') {
+            Brief::reopen((int)$brief['id']);
+            if ($brief['client_id']) {
+                Activity::log((int)$brief['client_id'], (int)$this->user()['id'], 'Website brief "' . ($brief['package_name'] ?: 'Website brief') . '" reopened so the client can edit it.');
+            }
+            $this->success('Brief reopened. The client can edit it again with the same link.');
+        }
+        $this->redirect('/briefs/' . $brief['id']);
+    }
+
     public function destroy(string $id): void
     {
         $brief = Brief::find((int)$id) ?? $this->notFound();
         Brief::delete((int)$id);
         if ($brief['client_id']) {
-            Activity::log((int)$brief['client_id'], (int)$this->user()['id'], 'Website brief deleted.');
+            $name = $brief['package_name'] ?: 'Website brief';
+            $state = strtolower(Brief::STATUSES[$brief['status']] ?? $brief['status']);
+            Activity::log((int)$brief['client_id'], (int)$this->user()['id'], 'Website brief "' . $name . '" deleted (' . $state . ').');
         }
         $this->success('Brief "' . $brief['client_label'] . '" deleted.');
-        $this->redirect($brief['client_id'] ? '/clients/' . $brief['client_id'] : '/briefs');
+        $toList = (string)$this->input('from') === 'list' || !$brief['client_id'];
+        $this->redirect($toList ? '/briefs' : '/clients/' . $brief['client_id']);
     }
 
     /** /admin/brief-ver.php?id=N (link format in older notification emails). */

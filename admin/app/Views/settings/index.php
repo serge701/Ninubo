@@ -45,6 +45,7 @@ $input = function (string $key, string $label, array $opt = []) use ($v): string
         <?= $input('business_state', 'State', ['col' => 'col-md-4']) ?>
         <?= $input('business_zip', 'ZIP code', ['col' => 'col-md-4']) ?>
         <?= $input('business_phone', 'Phone', ['type' => 'tel', 'placeholder' => '(956) 555-0123']) ?>
+        <?= $input('business_whatsapp', 'WhatsApp', ['type' => 'tel', 'placeholder' => '(956) 555-0123', 'hint' => 'Optional. Clients see a WhatsApp button on their website brief.']) ?>
         <?= $input('business_email', 'Email', ['type' => 'email']) ?>
         <?= $input('business_website', 'Website') ?>
         <?= $input('business_ein', 'EIN (optional)', ['placeholder' => 'XX-XXXXXXX']) ?>
@@ -89,7 +90,7 @@ $input = function (string $key, string $label, array $opt = []) use ($v): string
             $renewalOptions[(string)$item['id']] = $item['name'] . ' — ' . \Crm\Models\Package::priceLabel($item);
         }
         ?>
-        <?= form_field('website_renewal_package_id', 'Yearly renewal for website packages', (string)$v('website_renewal_package_id'), ['type' => 'select', 'col' => 'col-md-6', 'options' => $renewalOptions, 'hint' => 'Domain and hosting are included for the first year. When an invoice with a website package is issued, this service is scheduled one year later on the client\'s Recurring services.']) ?>
+        <?= form_field('website_renewal_package_id', 'Yearly renewal for website packages', (string)$v('website_renewal_package_id'), ['type' => 'select', 'col' => 'col-md-6', 'options' => $renewalOptions, 'hint' => 'Domain and hosting are included for the first year. When an invoice with a website package is issued, this service is scheduled one year later on the client\'s Recurring services — not while the client has a care plan (maintenance category), which includes hosting. Cancelling the last care plan schedules it again.']) ?>
         <?= $input('invoice_payment_instructions', 'Payment instructions', ['col' => 'col-md-6', 'type' => 'textarea', 'rows' => 4, 'placeholder' => "Zelle: payments@...\nCheck payable to: ...\nBank transfer: ..."]) ?>
         <?= $input('invoice_footer', 'Invoice footer note', ['col' => 'col-md-6', 'type' => 'textarea', 'rows' => 4]) ?>
       </div>

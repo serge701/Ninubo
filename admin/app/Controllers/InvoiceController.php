@@ -9,6 +9,7 @@ use Crm\Core\Pdf;
 use Crm\Core\Session;
 use Crm\Core\Settings;
 use Crm\Models\Activity;
+use Crm\Models\Brief;
 use Crm\Models\Client;
 use Crm\Models\Invoice;
 use Crm\Models\Package;
@@ -73,6 +74,7 @@ final class InvoiceController extends Controller
             'items' => Invoice::items((int)$inv['id']),
             'payments' => Invoice::payments((int)$inv['id']),
             'schedule' => Invoice::schedule($inv),
+            'briefs' => Brief::forInvoice((int)$inv['id']),
         ]);
     }
 
@@ -110,9 +112,15 @@ final class InvoiceController extends Controller
             Session::flash('danger', 'An invoice must have a total greater than $0 before it is issued.');
             $this->redirect('/invoices/' . $inv['id']);
         }
-        $number = Invoice::issue($inv, (int)$this->user()['id']);
-        Activity::log((int)$inv['client_id'], (int)$this->user()['id'], "Invoice {$number} issued for " . money($inv['total']) . '.');
-        $this->success("Invoice {$number} issued. Download the PDF to send it to the client.");
+        $userId = (int)$this->user()['id'];
+        [$number, $log] = Invoice::issue($inv, $userId);
+        Activity::log((int)$inv['client_id'], $userId, "Invoice {$number} issued for " . money($inv['total']) . '.');
+        foreach ($log as $line) {
+            Activity::log((int)$inv['client_id'], $userId, $line);
+        }
+        $briefs = Brief::forInvoice((int)$inv['id']);
+        $this->success("Invoice {$number} issued. Download the PDF to send it to the client"
+            . ($briefs ? ' — it includes the website brief link.' : '.'));
         $this->redirect('/invoices/' . $inv['id']);
     }
 
@@ -126,6 +134,11 @@ final class InvoiceController extends Controller
             'items' => Invoice::items((int)$inv['id']),
             'payments' => Invoice::payments((int)$inv['id']),
             'schedule' => Invoice::schedule($inv),
+            // The client gets the brief link with the invoice (only while there's something left to fill in).
+            'briefs' => $inv['status'] === 'void' ? [] : array_filter(
+                Brief::forInvoice((int)$inv['id']),
+                fn(array $b): bool => $b['status'] !== 'completado'
+            ),
             's' => Settings::all(),
             'logo' => Pdf::logoDataUri(),
         ], 'Invoice ' . Invoice::displayNumber($inv) . '.pdf', (bool)$this->input('inline', false));
@@ -195,8 +208,8 @@ final class InvoiceController extends Controller
             Session::flash('danger', 'Write the reason for voiding the invoice.');
             $this->redirect('/invoices/' . $inv['id']);
         }
-        $changed = Invoice::void((int)$inv['id'], $reason);
-        $extra = $changed ? ' Recurring services updated: ' . implode('; ', $changed) . '.' : '';
+        $changed = Invoice::void((int)$inv['id'], $reason, (int)$this->user()['id']);
+        $extra = $changed ? ' Also updated: ' . implode('; ', $changed) . '.' : '';
         Activity::log((int)$inv['client_id'], (int)$this->user()['id'], 'Invoice ' . $inv['number'] . ' voided: ' . $reason . '.' . $extra);
         $this->success('Invoice ' . $inv['number'] . ' voided. Its number is kept and will not be reused.' . $extra);
         $this->redirect('/invoices/' . $inv['id']);

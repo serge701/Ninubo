@@ -110,7 +110,13 @@ $sec = function (string $title) use (&$n): string { $n++; return '<h2>' . $n . '
   <?= $sec('Domain, Hosting and Yearly Renewal') ?>
   <p>
     The website package includes the domain name registration and website hosting for the <strong>first year</strong>
-    from the effective date. After the first year, domain and hosting renew yearly
+    from the effective date.
+    <?php if ($plans): ?>
+    After the first year, domain and hosting are included in the Client's monthly care plan (see below) and are not billed
+    separately while the plan is active. If the plan ends, domain and hosting renew yearly
+    <?php else: ?>
+    After the first year, domain and hosting renew yearly
+    <?php endif; ?>
     <?php if ($renewalPrice): ?>at <strong><?= e(money($renewalPrice)) ?> per year</strong> plus applicable sales tax<?php else: ?>at the Provider's then-current yearly rate<?php endif; ?>,
     billed in advance. The Provider may adjust the renewal price with at least 30 days' written notice before the renewal date.
     The domain is registered in the Client's name. If the renewal is not paid, the Provider may suspend hosting, and the

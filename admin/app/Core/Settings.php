@@ -19,6 +19,7 @@ final class Settings
         'business_state' => 'TX',
         'business_zip' => '',
         'business_phone' => '',
+        'business_whatsapp' => '',        // shown on client pages (website brief); blank = no WhatsApp button
         'business_email' => 'contacto@ninubo.com',
         'business_website' => 'https://ninubo.com',
         'business_ein' => '',

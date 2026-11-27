@@ -51,6 +51,12 @@ use Crm\Models\Brief;
             <div class="btn-list flex-nowrap">
               <a href="<?= url('/briefs/' . (int)$b['id']) ?>" class="btn btn-sm">Open</a>
               <button type="button" class="btn btn-sm" data-copy="<?= e(Brief::publicLink($b)) ?>"><i class="ti ti-copy me-1"></i>Copy link</button>
+              <?php if (is_admin()): ?>
+              <form method="post" action="<?= url('/briefs/' . (int)$b['id'] . '/delete') ?>" class="m-0" data-confirm="The brief for <?= e($b['client_label']) ?> is deleted: the link stops working and every answer is removed. This cannot be undone." data-confirm-title="Delete this brief?" data-confirm-button="Delete brief">
+                <?= csrf_field() ?><input type="hidden" name="from" value="list">
+                <button type="submit" class="btn btn-sm btn-ghost-danger" title="Delete brief" aria-label="Delete brief"><i class="ti ti-trash"></i></button>
+              </form>
+              <?php endif; ?>
             </div>
           </td>
         </tr>

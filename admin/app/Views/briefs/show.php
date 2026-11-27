@@ -1,4 +1,5 @@
 <?php
+use Crm\Core\BriefForm;
 use Crm\Core\Session;
 use Crm\Core\View;
 use Crm\Models\Brief;
@@ -11,8 +12,18 @@ $newLink = Session::peekFlash('new_brief_link');
 <?php else: ?>
 <a href="<?= url('/briefs') ?>" class="btn"><i class="ti ti-arrow-left me-1"></i>All briefs</a>
 <?php endif; ?>
+<a href="<?= e($link) ?>" class="btn" target="_blank" rel="noopener" title="Opens the client's form. Looking around doesn't change anything; only typing does."><i class="ti ti-external-link me-1"></i>Open form</a>
 <button type="button" class="btn btn-primary" data-copy="<?= e($link) ?>"><i class="ti ti-copy me-1"></i>Copy client link</button>
 <?php View::end(); ?>
+
+<?php if ($brief['status'] === 'completado'): ?>
+<div class="alert alert-info d-flex flex-wrap align-items-center gap-2">
+  <div class="me-auto">Submitted<?= $brief['completed_at'] ? ' ' . e(fmt_datetime($brief['completed_at'])) : '' ?>. The client can no longer change it. Need them to correct or add something?</div>
+  <form method="post" action="<?= url('/briefs/' . (int)$brief['id'] . '/reopen') ?>" class="m-0" data-confirm="The client can edit their answers again with the same link and submit it again." data-confirm-title="Reopen this brief?" data-confirm-button="Reopen">
+    <?= csrf_field() ?><button type="submit" class="btn btn-info btn-sm"><i class="ti ti-lock-open me-1"></i>Reopen for the client</button>
+  </form>
+</div>
+<?php endif; ?>
 
 <?php if ($newLink): ?>
 <div class="alert alert-success">
@@ -29,6 +40,7 @@ $newLink = Session::peekFlash('new_brief_link');
       <div><div class="text-secondary small">Package</div><?= e($brief['package_name'] ?: '—') ?> <span class="text-secondary small">(<?= e(Brief::profileLabel($brief['brief_profile'])) ?>)</span></div>
       <div><div class="text-secondary small">Form language</div><?= $brief['lang'] === 'en' ? 'English' : 'Spanish' ?></div>
       <div><div class="text-secondary small">Created</div><?= e(fmt_datetime($brief['created_at'])) ?><?= $brief['created_by_name'] ? ' · ' . e($brief['created_by_name']) : '' ?></div>
+      <?php if ($brief['invoice_id']): ?><div><div class="text-secondary small">From invoice</div><a href="<?= url('/invoices/' . (int)$brief['invoice_id']) ?>"><?= e($brief['invoice_number'] ?: 'Invoice') ?></a></div><?php endif; ?>
       <div><div class="text-secondary small">Last update</div><?= e(fmt_datetime($brief['updated_at'])) ?></div>
       <?php if ($brief['completed_at']): ?><div><div class="text-secondary small">Submitted</div><?= e(fmt_datetime($brief['completed_at'])) ?></div><?php endif; ?>
     </div>
@@ -44,11 +56,21 @@ $newLink = Session::peekFlash('new_brief_link');
     <div class="card-header"><h3 class="card-title"><?= e($step['title']) ?></h3></div>
     <div class="card-body crm-brief-view">
       <?php foreach ($step['fields'] as $fieldName => $field): ?>
-        <?= ninubo_brief_render_view($fieldName, $field, $data[$fieldName] ?? null, 'en') ?>
+        <?= BriefForm::view($fieldName, $field, $data[$fieldName] ?? null) ?>
       <?php endforeach; ?>
     </div>
   </div>
   <?php endforeach; ?>
+  <?php if ($legacy = BriefForm::legacyAnswers($schema, $data)): ?>
+  <div class="card mb-3">
+    <div class="card-header"><h3 class="card-title">Answers from an earlier version of the form</h3></div>
+    <div class="card-body crm-brief-view">
+      <?php foreach ($legacy as $label => $value): ?>
+      <div class="brief-view-row"><p class="brief-view-label"><?= e($label) ?></p><div class="brief-view-value"><?= nl2br(e($value)) ?></div></div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php endif; ?>
 <?php endif; ?>
 
 <?php if (is_admin()): ?>

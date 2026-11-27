@@ -31,7 +31,7 @@ final class SettingsController extends Controller
         }
 
         $errors = [];
-        normalize_phones($values, ['business_phone'], $errors);
+        normalize_phones($values, ['business_phone', 'business_whatsapp'], $errors);
         if (($values['business_name'] ?? '') === '') {
             $errors['business_name'] = 'Enter the name shown on documents.';
         }

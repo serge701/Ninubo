@@ -59,9 +59,15 @@ final class SubscriptionController extends Controller
     public function cancel(string $id): void
     {
         $sub = Subscription::find((int)$id) ?? $this->notFound();
+        $userId = (int)$this->user()['id'];
         Subscription::update((int)$sub['id'], ['status' => 'cancelled', 'cancelled_at' => date('Y-m-d H:i:s')]);
-        Activity::log((int)$sub['client_id'], (int)$this->user()['id'], 'Recurring service "' . $sub['description'] . '" cancelled.');
-        $this->success('Recurring service cancelled. No more invoices will be suggested for it.');
+        Activity::log((int)$sub['client_id'], $userId, 'Recurring service "' . $sub['description'] . '" cancelled.');
+        $extra = '';
+        if (Subscription::isCarePlan($sub) && ($msg = Subscription::restoreRenewal((int)$sub['client_id'], $userId))) {
+            Activity::log((int)$sub['client_id'], $userId, $msg . '.');
+            $extra = ' ' . $msg . ' — adjust its date if needed.';
+        }
+        $this->success('Recurring service cancelled. No more invoices will be suggested for it.' . $extra);
         $this->redirect('/clients/' . $sub['client_id'] . '#recurring');
     }
 }

@@ -6,7 +6,6 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 require_once dirname(__DIR__, 2) . '/includes/db.php';
 // Website-brief questions + profiles (shared with the public brief.php).
 require_once dirname(__DIR__, 2) . '/includes/brief-schema.php';
-require_once dirname(__DIR__, 2) . '/includes/brief-helpers.php';
 
 /** Absolute path of admin/. */
 define('CRM_ROOT', dirname(__DIR__));

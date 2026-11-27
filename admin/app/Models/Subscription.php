@@ -65,10 +65,13 @@ final class Subscription
      *  - a recurring line without a subscription starts one (this invoice covers the first period);
      *  - a line that bills an existing subscription moves it to the next period;
      *  - a website package (one with a brief profile) schedules the yearly domain & hosting renewal, since the
-     *    first year is included in the package.
+     *    first year is included in the package — unless the client has a care plan (maintenance category),
+     *    which already includes hosting; starting a care plan cancels a renewal that was scheduled.
+     * @return string[] timeline messages
      */
-    public static function scheduleFromInvoice(array $inv, array $items, int $userId): void
+    public static function scheduleFromInvoice(array $inv, array $items, int $userId): array
     {
+        $log = [];
         $issueDate = $inv['issue_date'];
         $hasWebsitePackage = false;
 
@@ -108,24 +111,98 @@ final class Subscription
             }
         }
 
-        if ($hasWebsitePackage) {
-            self::scheduleRenewal((int)$inv['client_id'], $issueDate, (int)$inv['id'], $userId);
+        $clientId = (int)$inv['client_id'];
+        $care = self::activeCarePlan($clientId);
+        if ($care) {
+            foreach (self::cancelRenewals($clientId) as $desc) {
+                $log[] = '"' . $desc . '" cancelled: hosting is included in the care plan "' . $care['description'] . '".';
+            }
+            if ($hasWebsitePackage) {
+                $log[] = 'No yearly domain & hosting renewal scheduled: hosting is included in the care plan "' . $care['description'] . '".';
+            }
+        } elseif ($hasWebsitePackage && ($msg = self::scheduleRenewal($clientId, self::addPeriod($issueDate, 'yearly'), (int)$inv['id'], $userId))) {
+            $log[] = $msg . '.';
         }
+        return $log;
     }
 
-    /** Yearly domain & hosting renewal one year after the website invoice (skipped if the client already has it). */
-    private static function scheduleRenewal(int $clientId, string $issueDate, int $invoiceId, int $userId): void
+    /** The client's active care plan (a recurring service from a "maintenance" catalog item), if any. */
+    public static function activeCarePlan(int $clientId): ?array
+    {
+        return Database::one(
+            "SELECT s.* FROM client_subscriptions s JOIN packages p ON p.id = s.package_id
+             WHERE s.client_id = ? AND s.status = 'active' AND p.category = 'maintenance'
+             ORDER BY s.start_date LIMIT 1",
+            [$clientId]
+        );
+    }
+
+    public static function isCarePlan(array $sub): bool
+    {
+        $pkg = $sub['package_id'] ? Package::find((int)$sub['package_id']) : null;
+        return $pkg !== null && $pkg['category'] === 'maintenance';
+    }
+
+    /** Cancels the client's active domain & hosting renewals. @return string[] their descriptions */
+    private static function cancelRenewals(int $clientId): array
+    {
+        $renewalId = (int)Settings::get('website_renewal_package_id');
+        $subs = Database::all(
+            "SELECT * FROM client_subscriptions WHERE client_id = ? AND package_id = ? AND status = 'active'",
+            [$clientId, $renewalId]
+        );
+        foreach ($subs as $sub) {
+            self::update((int)$sub['id'], ['status' => 'cancelled', 'cancelled_at' => date('Y-m-d H:i:s')]);
+        }
+        return array_column($subs, 'description');
+    }
+
+    /**
+     * After a care plan ends (cancelled, or its invoice voided): if the client has a website and no other care plan,
+     * the yearly domain & hosting renewal comes back, on the next anniversary of the website invoice.
+     * @return string|null timeline message
+     */
+    public static function restoreRenewal(int $clientId, int $userId): ?string
+    {
+        if (self::activeCarePlan($clientId)) {
+            return null;
+        }
+        $website = Database::one(
+            "SELECT i.id, i.issue_date FROM invoices i
+             JOIN invoice_items it ON it.invoice_id = i.id
+             JOIN packages p ON p.id = it.package_id
+             WHERE i.client_id = ? AND i.status NOT IN ('draft', 'void')
+               AND it.billing = 'one_time' AND p.category = 'website' AND p.brief_profile IS NOT NULL
+             ORDER BY i.issue_date LIMIT 1",
+            [$clientId]
+        );
+        if (!$website) {
+            return null;
+        }
+        $next = self::addPeriod($website['issue_date'], 'yearly');
+        while ($next < date('Y-m-d')) {
+            $next = self::addPeriod($next, 'yearly');
+        }
+        $msg = self::scheduleRenewal($clientId, $next, (int)$website['id'], $userId);
+        return $msg ? $msg . ' (no care plan includes hosting any more)' : null;
+    }
+
+    /**
+     * Yearly domain & hosting renewal starting on $date (skipped if the client already has it).
+     * @return string|null timeline message when it was scheduled
+     */
+    private static function scheduleRenewal(int $clientId, string $date, int $invoiceId, int $userId): ?string
     {
         $renewal = Package::find((int)Settings::get('website_renewal_package_id'));
         if (!$renewal || !(int)$renewal['is_active']) {
-            return;
+            return null;
         }
         $exists = (bool)Database::value(
             "SELECT COUNT(*) FROM client_subscriptions WHERE client_id = ? AND package_id = ? AND status = 'active'",
             [$clientId, (int)$renewal['id']]
         );
         if ($exists) {
-            return;
+            return null;
         }
         Database::insert('client_subscriptions', [
             'client_id' => $clientId,
@@ -135,11 +212,12 @@ final class Subscription
             'unit_price' => $renewal['price'],
             'billing' => $renewal['billing'] === 'monthly' ? 'monthly' : 'yearly',
             'tax_type' => $renewal['tax_type'],
-            'start_date' => self::addPeriod($issueDate, 'yearly'),
-            'next_invoice_date' => self::addPeriod($issueDate, 'yearly'),
+            'start_date' => $date,
+            'next_invoice_date' => $date,
             'source_invoice_id' => $invoiceId,
             'created_by' => $userId,
         ]);
+        return '"' . $renewal['name'] . '" scheduled for ' . fmt_date($date);
     }
 
     /** Line item that bills the subscription's next period (used to build the renewal draft invoice). */

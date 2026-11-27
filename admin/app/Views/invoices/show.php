@@ -1,5 +1,6 @@
 <?php
 use Crm\Core\View;
+use Crm\Models\Brief;
 use Crm\Models\Client;
 use Crm\Models\Invoice;
 
@@ -111,6 +112,24 @@ $canPay = in_array($inv['status'], ['sent', 'partial'], true);
         <?php endforeach; ?>
       </div>
       <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($briefs): ?>
+    <div class="card mb-3">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-forms me-2"></i>Website brief</h3></div>
+      <div class="list-group list-group-flush">
+        <?php foreach ($briefs as $b): ?>
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center gap-2">
+            <a href="<?= url('/briefs/' . (int)$b['id']) ?>" class="fw-medium"><?= e($b['package_name'] ?: 'Website brief') ?></a>
+            <?= status_badge($b['status'], Brief::STATUS_COLORS, Brief::STATUSES) ?>
+          </div>
+          <button type="button" class="btn btn-sm mt-2" data-copy="<?= e(Brief::publicLink($b)) ?>"><i class="ti ti-copy me-1"></i>Copy link</button>
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <div class="card-footer small text-secondary">Created when the invoice was issued. The link is also printed on the PDF.</div>
     </div>
     <?php endif; ?>
 

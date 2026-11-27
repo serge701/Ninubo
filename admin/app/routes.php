@@ -89,6 +89,7 @@ $router->post('/catalog/{id}/delete', [CatalogController::class, 'destroy'], $ad
 $router->get('/briefs', [BriefController::class, 'index']);
 $router->post('/briefs', [BriefController::class, 'store']);
 $router->get('/briefs/{id}', [BriefController::class, 'show']);
+$router->post('/briefs/{id}/reopen', [BriefController::class, 'reopen']);
 $router->post('/briefs/{id}/delete', [BriefController::class, 'destroy'], $admin);
 // Old notification emails linked to admin/brief-ver.php?id=N
 $router->get('/brief-ver.php', [BriefController::class, 'legacy']);

@@ -78,7 +78,7 @@ $taxLabels = Package::taxTypes();
             </label>
             <?php endforeach; ?>
           </div>
-          <div class="form-hint mt-2">Domain and hosting are included for the first year; the yearly renewal is scheduled automatically when the invoice is issued.</div>
+          <div class="form-hint mt-2">Domain and hosting are included for the first year; the yearly renewal is scheduled automatically when the invoice is issued — unless the client has a monthly care plan, which already includes hosting. Issuing also creates the website brief.</div>
         </div>
       </div>
 

@@ -106,6 +106,14 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
             </div>
             <div class="col-auto"><?= status_badge($b['status'], Brief::STATUS_COLORS, Brief::STATUSES) ?></div>
             <div class="col-auto"><button type="button" class="btn btn-sm" data-copy="<?= e(Brief::publicLink($b)) ?>"><i class="ti ti-copy me-1"></i>Copy link</button></div>
+            <?php if (is_admin()): ?>
+            <div class="col-auto">
+              <form method="post" action="<?= url('/briefs/' . (int)$b['id'] . '/delete') ?>" class="m-0" data-confirm="The link stops working and every answer is removed. This cannot be undone." data-confirm-title="Delete this brief?" data-confirm-button="Delete brief">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-sm btn-ghost-danger" title="Delete brief" aria-label="Delete brief"><i class="ti ti-trash"></i></button>
+              </form>
+            </div>
+            <?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
@@ -143,7 +151,7 @@ $openTasks = array_filter($activities, fn($a) => $a['type'] === 'task' && $a['do
     <div class="card mb-3" id="recurring">
       <div class="card-header"><h3 class="card-title"><i class="ti ti-repeat me-2"></i>Recurring services</h3></div>
       <?php if (!$subscriptions): ?>
-      <div class="card-body text-secondary small">None yet. Care plans and the yearly domain &amp; hosting renewal are added here automatically when an invoice that includes them is issued.</div>
+      <div class="card-body text-secondary small">None yet. Care plans and the yearly domain &amp; hosting renewal are added here automatically when an invoice that includes them is issued (no renewal while a care plan is active — it includes hosting).</div>
       <?php else: ?>
       <div class="list-group list-group-flush">
         <?php foreach ($subscriptions as $sub):

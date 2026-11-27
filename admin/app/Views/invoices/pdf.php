@@ -157,6 +157,15 @@ $fmtQty = fn($q) => rtrim(rtrim(number_format((float)$q, 2, '.', ''), '0'), '.')
 </div>
 <?php endif; ?>
 
+<?php foreach ($briefs as $b): ?>
+<div class="box">
+  <div class="label">Your website content<?= count($briefs) > 1 ? ' — ' . e($b['package_name']) : '' ?></div>
+  To start your website we need your information (texts, logo, photos, colors). Fill in this form — you can save
+  and come back to it any time:<br>
+  <a href="<?= e(\Crm\Models\Brief::publicLink($b)) ?>" style="color:#0c4a6e; word-break:break-all;"><?= e(\Crm\Models\Brief::publicLink($b)) ?></a>
+</div>
+<?php endforeach; ?>
+
 <?php if (trim((string)$inv['notes']) !== ''): ?>
 <div class="box">
   <div class="label">Notes</div>
